@@ -1,0 +1,96 @@
+﻿<aside class="ab-sidebar" id="abSidebar">
+
+    <div class="ab-sidebar-logo">
+        <div class="logo-icon">🚗</div>
+        <span class="logo-text">AUTO<span>BASE</span></span>
+    </div>
+
+    <nav class="ab-nav">
+
+        <!-- OVERVIEW -->
+        <div class="nav-section">
+            <div class="nav-section-label">Overview</div>
+            <a asp-controller="Home" asp-action="AdminDashboard" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+                </span>
+                Dashboard
+            </a>
+        </div>
+
+        <!-- VEHICLE -->
+        <div class="nav-section">
+            <div class="nav-section-label">Vehicle</div>
+            <a asp-controller="Vehicle" asp-action="AddVehicle" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
+                </span>
+                Add Vehicle
+            </a>
+            <a asp-controller="Vehicle" asp-action="EditVehicle" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                </span>
+                Edit Vehicle
+            </a>
+            <a asp-controller="Vehicle" asp-action="DeleteVehicle" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" /></svg>
+                </span>
+                Delete Vehicle
+            </a>
+        </div>
+
+        <!-- USER -->
+        <div class="nav-section">
+            <div class="nav-section-label">User</div>
+            <a asp-controller="User" asp-action="AddUser" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="16" y1="11" x2="22" y2="11" /></svg>
+                </span>
+                Add User
+            </a>
+            <a asp-controller="User" asp-action="EditUser" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                </span>
+                Edit User
+            </a>
+        </div>
+
+        <!-- AUTOBASE -->
+        <div class="nav-section">
+            <div class="nav-section-label">Autobase</div>
+            <a asp-controller="Autobase" asp-action="AllocatedVehicle" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h4l3 5v3h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
+                </span>
+                Allocated Vehicle
+            </a>
+            <a asp-controller="Autobase" asp-action="SeeRequest" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                </span>
+                See Requests
+            </a>
+            <a asp-controller="Autobase" asp-action="AvailableVehicle" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                </span>
+                Available Vehicle
+            </a>
+        </div>
+
+    </nav>
+
+    <div class="ab-sidebar-footer">
+        <div class="sidebar-user">
+            <div class="user-avatar">@(ViewBag.Name?.ToString()?.Substring(0, 1).ToUpper() ?? "A")</div>
+            <div class="user-info">
+                <div class="user-name">@ViewBag.Name</div>
+                <div class="user-role">@ViewBag.Role &nbsp;·&nbsp; #@ViewBag.EmpNo</div>
+            </div>
+        </div>
+    </div>
+
+</aside>

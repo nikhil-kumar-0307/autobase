@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="alert alert-success">
+        <h4>👋 Welcome, @ViewBag.Name</h4>
+        <p class="mb-0">Role: <strong>@ViewBag.Role</strong> &nbsp;|&nbsp; Emp No: <strong>@ViewBag.EmpNo</strong></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">📋 My Profile</h5>
+                    <p><strong>Name:</strong> @ViewBag.Name</p>
+                    <p><strong>Employee No:</strong> @ViewBag.EmpNo</p>
+                    <p><strong>Mobile:</strong> @ViewBag.Mobile</p>
+                    <p><strong>Role:</strong> @ViewBag.Role</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger mt-3">
+        🚪 Logout
+    </a>
+</div>

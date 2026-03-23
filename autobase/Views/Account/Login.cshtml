@@ -1,0 +1,442 @@
+﻿@model autobase.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VehicleTrack – Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --yellow: #F5C518;
+            --yellow-dk: #d4a90e;
+            --dark: #0d0f14;
+            --panel-bg: #ffffff;
+            --label: #6b7280;
+            --border: #e5e7eb;
+            --focus: #F5C518;
+            --error: #ef4444;
+            --input-bg: #f9fafb;
+            --text: #111827;
+            --muted: #9ca3af;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Barlow', sans-serif;
+            background: var(--dark);
+        }
+
+        /* ── LAYOUT ─────────────────────────────────────── */
+        .page {
+            display: grid;
+            grid-template-columns: 480px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ── LEFT PANEL ─────────────────────────────────── */
+        .left {
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 48px 52px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* brand */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 56px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--yellow);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+        }
+
+        .brand-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+            color: var(--text);
+        }
+
+        /* heading */
+        .heading {
+            margin-bottom: 8px;
+        }
+
+            .heading h1 {
+                font-family: 'Barlow Condensed', sans-serif;
+                font-weight: 800;
+                font-size: 36px;
+                color: var(--text);
+                line-height: 1.1;
+            }
+
+            .heading p {
+                margin-top: 6px;
+                font-size: 14px;
+                color: var(--muted);
+                font-weight: 400;
+            }
+
+        /* form */
+        .form {
+            margin-top: 36px;
+            flex: 1;
+        }
+
+        .field {
+            margin-bottom: 22px;
+        }
+
+            .field label {
+                display: block;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1.2px;
+                text-transform: uppercase;
+                color: var(--label);
+                margin-bottom: 8px;
+            }
+
+        .input-wrap {
+            position: relative;
+        }
+
+            .input-wrap input {
+                width: 100%;
+                padding: 13px 16px;
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                background: var(--input-bg);
+                font-family: 'Barlow', sans-serif;
+                font-size: 15px;
+                color: var(--text);
+                outline: none;
+                transition: border-color .2s, box-shadow .2s, background .2s;
+            }
+
+                .input-wrap input::placeholder {
+                    color: var(--muted);
+                }
+
+                .input-wrap input:focus {
+                    border-color: var(--yellow);
+                    background: #fff;
+                    box-shadow: 0 0 0 3px rgba(245,197,24,.18);
+                }
+
+        /* password toggle */
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1;
+            padding: 4px;
+            transition: color .2s;
+        }
+
+            .toggle-pw:hover {
+                color: var(--text);
+            }
+
+        .input-wrap input[type="password"],
+        .input-wrap input[type="text"].pw-field {
+            padding-right: 44px;
+        }
+
+        /* validation */
+        .field-error {
+            display: block;
+            font-size: 12px;
+            color: var(--error);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .input-wrap input.input-invalid {
+            border-color: var(--error);
+        }
+
+        /* summary error */
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: var(--error);
+            font-weight: 500;
+        }
+
+        /* success */
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        /* submit */
+        .btn-signin {
+            width: 100%;
+            padding: 15px;
+            background: var(--yellow);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 1px;
+            color: #111;
+            cursor: pointer;
+            transition: background .2s, transform .1s, box-shadow .2s;
+            margin-top: 4px;
+        }
+
+            .btn-signin:hover {
+                background: var(--yellow-dk);
+                box-shadow: 0 4px 20px rgba(245,197,24,.4);
+            }
+
+            .btn-signin:active {
+                transform: scale(0.98);
+            }
+
+        /* footer links */
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 36px;
+        }
+
+            .footer-links a, .footer-links span {
+                font-size: 13.5px;
+                color: var(--muted);
+                text-decoration: none;
+            }
+
+                .footer-links a:hover {
+                    color: var(--text);
+                }
+
+            .footer-links .create a {
+                color: var(--text);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .footer-links .create a:hover {
+                    color: var(--yellow-dk);
+                }
+
+        /* ── RIGHT PANEL ─────────────────────────────────── */
+        .right {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .right-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.55);
+        }
+
+        .right-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(13,15,20,.6) 0%, rgba(20,30,60,.4) 100%);
+        }
+
+        .right-wordmark {
+            position: absolute;
+            bottom: 52px;
+            right: 52px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 52px;
+            letter-spacing: 4px;
+            color: rgba(255,255,255,.85);
+            text-shadow: 0 2px 24px rgba(0,0,0,.5);
+        }
+
+            .right-wordmark span {
+                color: var(--yellow);
+            }
+
+        /* ── RESPONSIVE ──────────────────────────────────── */
+        @@media (max-width: 860px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .right {
+                display: none;
+            }
+
+            .left {
+                padding: 36px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <!-- ── LEFT PANEL ───────────────────────── -->
+        <aside class="left">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="brand-icon">🚛</div>
+                <span class="brand-name">VehicleTrack</span>
+            </div>
+
+            <!-- Heading -->
+            <div class="heading">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <!-- Form -->
+            <div class="form">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert-success">@TempData["Success"]</div>
+                }
+
+                <form asp-action="Login" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <!-- Global validation errors -->
+                    @{
+                        var globalErrors = ViewData.ModelState
+                        .Where(x => x.Key == "" && x.Value?.Errors.Count > 0)
+                        .SelectMany(x => x.Value!.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+                    }
+                    @if (globalErrors.Any())
+                    {
+                        <div class="alert-error">
+                            @foreach (var err in globalErrors)
+                            {
+                                <div>@err</div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Employee Number -->
+                    <div class="field">
+                        <label asp-for="EmployeeNumber">Employee Number</label>
+                        <div class="input-wrap">
+                            <input asp-for="EmployeeNumber"
+                                   type="text"
+                                   placeholder="e.g. 1001"
+                                   autocomplete="username"
+                                   class="@(ViewData.ModelState["EmployeeNumber"]?.Errors.Count > 0 ? "input-invalid" : "")" />
+                        </div>
+                        <span asp-validation-for="EmployeeNumber" class="field-error"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="field">
+                        <label asp-for="Password">Password</label>
+                        <div class="input-wrap">
+                            <input asp-for="Password"
+                                   type="password"
+                                   id="passwordField"
+                                   placeholder="••••••••"
+                                   autocomplete="current-password"
+                                   class="pw-field @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "input-invalid" : "")" />
+                            <button type="button" class="toggle-pw" onclick="togglePassword()" id="toggleBtn" title="Show/hide password">
+                                👁
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="field-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn-signin">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-links">
+                <span class="create">New here? <a asp-action="Register">Create account</a></span>
+                <a href="#">Terms &amp; Conditions</a>
+            </div>
+
+        </aside>
+
+        <!-- ── RIGHT PANEL ──────────────────────── -->
+        <section class="right">
+            <!--
+                Replace the src below with your actual building/dealership image.
+                Example: src="~/images/autobase-building.jpg"
+            -->
+            <img class="right-bg"
+                 src="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=1400&q=80"
+                 alt="AUTOBASE dealership" />
+            <div class="right-overlay"></div>
+            <div class="right-wordmark">AUTO<span>BASE</span></div>
+        </section>
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            const field = document.getElementById('passwordField');
+            const btn   = document.getElementById('toggleBtn');
+            if (field.type === 'password') {
+                field.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+    </script>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

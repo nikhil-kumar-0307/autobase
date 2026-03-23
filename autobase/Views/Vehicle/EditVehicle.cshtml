@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Edit Vehicle";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+<link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+
+<div class="ab-shell">
+    @await Html.PartialAsync("_AdminSidebar")
+    <div class="ab-main">
+        @await Html.PartialAsync("_AdminTopbar")
+        <div class="ab-content">
+            <div class="page-header">
+                <div class="page-title">✏️ Edit Vehicle</div>
+                <div class="page-sub">Hello! Edit Vehicle page — your form goes here.</div>
+            </div>
+        </div>
+    </div>
+</div>

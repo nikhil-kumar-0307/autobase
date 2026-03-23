@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "See Requests";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+<link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+
+<div class="ab-shell">
+    @await Html.PartialAsync("_AdminSidebar")
+    <div class="ab-main">
+        @await Html.PartialAsync("_AdminTopbar")
+        <div class="ab-content">
+            <div class="page-header">
+                <div class="page-title">📋 See Requests</div>
+                <div class="page-sub">Hello! See Requests page — your content goes here.</div>
+            </div>
+        </div>
+    </div>
+</div>
