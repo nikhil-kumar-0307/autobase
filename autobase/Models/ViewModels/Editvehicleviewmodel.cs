@@ -2,8 +2,10 @@
 
 namespace autobase.Models.ViewModels
 {
-    public class AddVehicleViewModel
+    public class EditVehicleViewModel
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Vehicle name is required")]
         public string VehicleName { get; set; } = string.Empty;
 

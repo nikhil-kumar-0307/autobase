@@ -15,8 +15,8 @@ namespace autobase.Controllers
         }
 
         private void SetUserViewBag()
-            {
-                ViewBag.Name = HttpContext.Session.GetString("UserName");
+        {
+            ViewBag.Name = HttpContext.Session.GetString("UserName");
             ViewBag.Role = HttpContext.Session.GetString("UserRole");
             ViewBag.EmpNo = HttpContext.Session.GetString("UserEmployeeNumber");
             ViewBag.Mobile = HttpContext.Session.GetString("UserMobile");
@@ -49,8 +49,7 @@ namespace autobase.Controllers
                 return View(model);
             }
 
-            // Check duplicate registration number
-            if (_db.Vehicles.Any(v => v.RegistrationNumber == model.RegistrationNumber))
+            if (_db.Vehicles.Any(v => v.RegistrationNumber == model.RegistrationNumber && v.IsActive))
             {
                 ModelState.AddModelError("RegistrationNumber", "This registration number already exists.");
                 SetUserViewBag();
@@ -63,11 +62,10 @@ namespace autobase.Controllers
                 RegistrationNumber = model.RegistrationNumber,
                 VehicleType = model.VehicleType,
                 Year = model.Year,
-                FuelType = model.FuelType,
+                Quantity = model.Quantity,
                 Status = model.Status,
-                ChassisNumber = model.ChassisNumber,
-                EngineNumber = model.EngineNumber,
                 Notes = model.Notes,
+                IsActive = true,
                 CreatedAt = DateTime.Now
             };
 
@@ -78,22 +76,117 @@ namespace autobase.Controllers
             return RedirectToAction("AddVehicle", "Vehicle");
         }
 
-        // ── GET: Edit Vehicle ──
+        // ── GET: Edit Vehicle List ──
         [HttpGet]
         public IActionResult EditVehicle()
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
             SetUserViewBag();
-            return View();
+            // Only show active vehicles
+            var vehicles = _db.Vehicles
+                              .Where(v => v.IsActive)
+                              .OrderByDescending(v => v.CreatedAt)
+                              .ToList();
+            return View(vehicles);
         }
 
-        // ── GET: Delete Vehicle ──
+        // ── GET: Edit Single Vehicle Form ──
+        [HttpGet]
+        public IActionResult EditVehicleForm(int id)
+        {
+            if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
+            SetUserViewBag();
+
+            var vehicle = _db.Vehicles.Find(id);
+            if (vehicle == null || !vehicle.IsActive) return NotFound();
+
+            var model = new EditVehicleViewModel
+            {
+                Id = vehicle.Id,
+                VehicleName = vehicle.VehicleName,
+                RegistrationNumber = vehicle.RegistrationNumber,
+                VehicleType = vehicle.VehicleType,
+                Year = vehicle.Year,
+                Quantity = vehicle.Quantity,
+                Status = vehicle.Status,
+                Notes = vehicle.Notes
+            };
+
+            return View(model);
+        }
+
+        // ── POST: Save Edited Vehicle ──
+        [HttpPost]
+        public IActionResult EditVehicleForm(EditVehicleViewModel model)
+        {
+            if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
+
+            if (!ModelState.IsValid)
+            {
+                SetUserViewBag();
+                return View(model);
+            }
+
+            var vehicle = _db.Vehicles.Find(model.Id);
+            if (vehicle == null || !vehicle.IsActive) return NotFound();
+
+            if (_db.Vehicles.Any(v => v.RegistrationNumber == model.RegistrationNumber
+                                   && v.Id != model.Id
+                                   && v.IsActive))
+            {
+                ModelState.AddModelError("RegistrationNumber", "This registration number already exists.");
+                SetUserViewBag();
+                return View(model);
+            }
+
+            vehicle.VehicleName = model.VehicleName;
+            vehicle.RegistrationNumber = model.RegistrationNumber;
+            vehicle.VehicleType = model.VehicleType;
+            vehicle.Year = model.Year;
+            vehicle.Quantity = model.Quantity;
+            vehicle.Status = model.Status;
+            vehicle.Notes = model.Notes;
+
+            _db.SaveChanges();
+
+            TempData["Success"] = "Vehicle updated successfully!";
+            return RedirectToAction("EditVehicle", "Vehicle");
+        }
+
+        // ── GET: Delete Vehicle List ──
         [HttpGet]
         public IActionResult DeleteVehicle()
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
             SetUserViewBag();
-            return View();
+            // Show only active vehicles (can be disabled)
+            var vehicles = _db.Vehicles
+                              .Where(v => v.IsActive)
+                              .OrderByDescending(v => v.CreatedAt)
+                              .ToList();
+            return View(vehicles);
+        }
+
+        // ── POST: Soft Delete (Disable) Vehicle ──
+        [HttpPost]
+        public IActionResult ConfirmDelete(int id)
+        {
+            if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
+
+            var vehicle = _db.Vehicles.Find(id);
+
+            if (vehicle == null)
+            {
+                TempData["Error"] = "Vehicle not found.";
+                return RedirectToAction("DeleteVehicle");
+            }
+
+            // Soft delete — just mark as inactive, do NOT remove from DB
+            vehicle.IsActive = false;
+            _db.SaveChanges();
+
+            TempData["Success"] = $"{vehicle.VehicleName} ({vehicle.RegistrationNumber}) has been disabled successfully.";
+            return RedirectToAction("DeleteVehicle");
         }
     }
 }
