@@ -9,6 +9,7 @@ namespace autobase.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<VehicleType> VehicleTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

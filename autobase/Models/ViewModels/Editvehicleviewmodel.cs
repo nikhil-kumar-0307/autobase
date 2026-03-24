@@ -19,10 +19,6 @@ namespace autobase.Models.ViewModels
         [Range(1990, 2030, ErrorMessage = "Enter a valid year")]
         public int Year { get; set; }
 
-        [Required(ErrorMessage = "Quantity is required")]
-        [Range(1, 999, ErrorMessage = "Quantity must be at least 1")]
-        public int Quantity { get; set; } = 1;
-
         [Required(ErrorMessage = "Status is required")]
         public string Status { get; set; } = "Available";
 

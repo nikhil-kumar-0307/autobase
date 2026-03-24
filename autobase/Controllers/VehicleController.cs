@@ -34,6 +34,10 @@ namespace autobase.Controllers
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
             SetUserViewBag();
+            ViewBag.VehicleTypeList = _db.VehicleTypes
+                                         .Where(v => v.IsActive)
+                                         .OrderBy(v => v.VehicleName)
+                                         .ToList();
             return View();
         }
 
@@ -46,6 +50,10 @@ namespace autobase.Controllers
             if (!ModelState.IsValid)
             {
                 SetUserViewBag();
+                ViewBag.VehicleTypeList = _db.VehicleTypes
+                                             .Where(v => v.IsActive)
+                                             .OrderBy(v => v.VehicleName)
+                                             .ToList();
                 return View(model);
             }
 
@@ -53,6 +61,10 @@ namespace autobase.Controllers
             {
                 ModelState.AddModelError("RegistrationNumber", "This registration number already exists.");
                 SetUserViewBag();
+                ViewBag.VehicleTypeList = _db.VehicleTypes
+                                             .Where(v => v.IsActive)
+                                             .OrderBy(v => v.VehicleName)
+                                             .ToList();
                 return View(model);
             }
 
@@ -62,7 +74,6 @@ namespace autobase.Controllers
                 RegistrationNumber = model.RegistrationNumber,
                 VehicleType = model.VehicleType,
                 Year = model.Year,
-                Quantity = model.Quantity,
                 Status = model.Status,
                 Notes = model.Notes,
                 IsActive = true,
@@ -107,7 +118,6 @@ namespace autobase.Controllers
                 RegistrationNumber = vehicle.RegistrationNumber,
                 VehicleType = vehicle.VehicleType,
                 Year = vehicle.Year,
-                Quantity = vehicle.Quantity,
                 Status = vehicle.Status,
                 Notes = vehicle.Notes
             };
@@ -143,7 +153,6 @@ namespace autobase.Controllers
             vehicle.RegistrationNumber = model.RegistrationNumber;
             vehicle.VehicleType = model.VehicleType;
             vehicle.Year = model.Year;
-            vehicle.Quantity = model.Quantity;
             vehicle.Status = model.Status;
             vehicle.Notes = model.Notes;
 

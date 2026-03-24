@@ -29,6 +29,6 @@ namespace autobase.Models.ViewModels
         public required string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
-        public required string Role { get; set; }   // e.g., Admin, User, Manager
+        public required string Role { get; set; }   // e.g., Admin, User
     }
 }

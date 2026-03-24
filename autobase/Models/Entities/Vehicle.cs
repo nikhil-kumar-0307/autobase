@@ -7,7 +7,6 @@
         public string RegistrationNumber { get; set; } = string.Empty;
         public string VehicleType { get; set; } = string.Empty;
         public int Year { get; set; }
-        public int Quantity { get; set; } = 1;
         public string Status { get; set; } = "Available";
         public string Notes { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;   // false = disabled (soft delete)

@@ -396,65 +396,6 @@
         line-height: 1.6;
     }
 
-    /* ── Qty Stepper ──────────────────────────────── */
-    .av-qty-wrap {
-        display: flex;
-        align-items: center;
-        background: var(--surface2);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius-sm);
-        overflow: hidden;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        height: 48px;
-    }
-
-    .av-qty-wrap:focus-within {
-        border-color: var(--gold);
-        box-shadow: 0 0 0 4px var(--gold-glow);
-        background: #fff;
-    }
-
-    .av-qty-btn {
-        width: 48px;
-        height: 100%;
-        background: transparent;
-        border: none;
-        font-size: 20px;
-        font-weight: 300;
-        color: var(--muted);
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-family: 'DM Sans', sans-serif;
-    }
-
-    .av-qty-btn:hover {
-        background: var(--gold);
-        color: var(--ink);
-    }
-
-    .av-qty-input {
-        flex: 1;
-        height: 100%;
-        text-align: center;
-        background: transparent;
-        border: none;
-        font-family: 'Syne', sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--ink);
-        outline: none;
-        min-width: 0;
-    }
-
-    /* hide number arrows */
-    .av-qty-input::-webkit-outer-spin-button,
-    .av-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .av-qty-input[type=number] { -moz-appearance: textfield; }
-
     /* ── Field Error ──────────────────────────────── */
     .av-field-error {
         font-size: 12px;
@@ -751,20 +692,6 @@
                         <div class="av-section-label">Fleet Configuration</div>
 
                         <div class="av-form-grid">
-
-                            <!-- Quantity -->
-                            <div class="av-form-group">
-                                <label asp-for="Quantity" class="av-label">
-                                    Quantity <span class="req">*</span>
-                                </label>
-                                <div class="av-qty-wrap">
-                                    <button type="button" class="av-qty-btn" onclick="changeQty(-1)" aria-label="Decrease">−</button>
-                                    <input asp-for="Quantity" id="qtyInput" class="av-qty-input"
-                                           type="number" min="1" max="999" value="1" />
-                                    <button type="button" class="av-qty-btn" onclick="changeQty(1)" aria-label="Increase">+</button>
-                                </div>
-                                <span asp-validation-for="Quantity" class="av-field-error"></span>
-                            </div>
 
                             <!-- Status -->
                             <div class="av-form-group">

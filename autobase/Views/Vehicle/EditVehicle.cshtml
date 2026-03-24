@@ -197,7 +197,7 @@
         margin-bottom: 22px;
     }
 
-    .qty-badge {
+    /* .qty-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -209,7 +209,7 @@
         font-weight: 700;
         color: var(--text);
         min-width: 36px;
-    }
+    } */
 </style>
 
 <div class="ab-shell">
@@ -258,8 +258,7 @@
                                 <th>Vehicle Name</th>
                                 <th>Reg. Number</th>
                                 <th>Type</th>
-                                <th>Year</th>
-                                <th>Quantity</th>
+                                <th>Year</th>                              
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -272,8 +271,7 @@
                                     <td><strong>@v.VehicleName</strong></td>
                                     <td style="font-family:monospace;font-size:13px;">@v.RegistrationNumber</td>
                                     <td>@v.VehicleType</td>
-                                    <td>@v.Year</td>
-                                    <td><span class="qty-badge">@v.Quantity</span></td>
+                                    <td>@v.Year</td>                               
                                     <td>
                                         @{
                                             var pillClass = v.Status switch

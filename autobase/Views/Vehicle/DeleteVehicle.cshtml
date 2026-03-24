@@ -389,7 +389,6 @@
                                 <th>Reg. Number</th>
                                 <th>Type</th>
                                 <th>Year</th>
-                                <th>Qty</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -403,7 +402,7 @@
                                     <td style="font-family:monospace;font-size:13px;">@v.RegistrationNumber</td>
                                     <td>@v.VehicleType</td>
                                     <td>@v.Year</td>
-                                    <td>@v.Quantity</td>
+                                    @* <td>@v.Quantity</td> *@
                                     <td>
                                         @{
                                             var pillClass = v.Status switch

@@ -10,7 +10,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 //Register Session
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(60);
+    options.IdleTimeout = TimeSpan.FromSeconds(120);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

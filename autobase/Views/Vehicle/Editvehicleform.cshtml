@@ -103,12 +103,12 @@
         margin-top: 2px;
     }
 
-    .qty-wrap {
+    /* .qty-wrap {
         display: flex;
         align-items: center;
-    }
+    } */
 
-    .qty-btn {
+    /* .qty-btn {
         width: 38px;
         height: 42px;
         background: var(--bg);
@@ -121,8 +121,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
-    }
+        flex-shrink: 0; */
+    /* }
 
         .qty-btn:first-child {
             border-radius: 9px 0 0 9px;
@@ -138,9 +138,9 @@
             background: var(--accent);
             color: #111;
             border-color: var(--accent);
-        }
+        } */
 
-    .qty-input {
+    /* .qty-input {
         height: 42px;
         width: 80px;
         text-align: center;
@@ -153,7 +153,7 @@
         font-weight: 700;
         color: var(--text);
         outline: none;
-    }
+    } */
 
     .form-actions {
         display: flex;
@@ -282,7 +282,7 @@
                         </div>
 
                         <!-- Quantity stepper -->
-                        <div class="form-group">
+                        @* <div class="form-group">
                             <label asp-for="Quantity" class="form-label">Quantity <span>*</span></label>
                             <div class="qty-wrap">
                                 <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
@@ -291,8 +291,8 @@
                                 <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
                             </div>
                             <span asp-validation-for="Quantity" class="field-error"></span>
-                        </div>
-
+                        </div> *@
+                            
                         <!-- Status -->
                         <div class="form-group">
                             <label asp-for="Status" class="form-label">Status <span>*</span></label>
