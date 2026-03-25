@@ -1,18 +1,804 @@
-﻿@{
+﻿@model autobase.Models.ViewModels.AllocatedVehicleViewModel
+@{
     ViewData["Title"] = "Allocated Vehicle";
     Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
 }
 <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+
+<style>
+    :root {
+        --green: #1d9e75;
+        --green-bg: #e1f5ee;
+        --blue: #185fa5;
+        --blue-bg: #e6f1fb;
+        --amber: #ba7517;
+        --amber-bg: #faeeda;
+        --red: #a32d2d;
+        --red-bg: #fcebeb;
+        --gray-bg: #f9f8f4;
+        --border: #e8e6de;
+        --text: #2c2c2a;
+        --muted: #888780;
+        --radius: 14px;
+    }
+
+    /* ── Summary strip ── */
+    .alloc-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 26px;
+    }
+
+    .alloc-stat {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .alloc-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+    .as-total::before {
+        background: #888780;
+    }
+
+    .as-inuse::before {
+        background: var(--blue);
+    }
+
+    .as-overdue::before {
+        background: var(--red);
+    }
+
+    .alloc-stat .as-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .alloc-stat .as-num {
+        font-size: 34px;
+        font-weight: 700;
+        font-family: Georgia, serif;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .alloc-stat .as-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 9px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text);
+        outline: none;
+        transition: border-color .2s;
+    }
+
+        .filter-search:focus {
+            border-color: var(--blue);
+        }
+
+    .filter-btn {
+        padding: 8px 15px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .filter-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-bg);
+        }
+
+        .filter-btn.active {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-bg);
+        }
+
+        .filter-btn.f-overdue.active {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+    /* ── Card grid ── */
+    .alloc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .alloc-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: transform .15s, box-shadow .15s;
+    }
+
+        .alloc-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,0,0,.07);
+        }
+
+        .alloc-card.overdue {
+            border-color: #f7c1c1;
+        }
+
+    /* Card top band */
+    .ac-top {
+        padding: 16px 18px 14px;
+        background: var(--blue-bg);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .alloc-card.overdue .ac-top {
+        background: var(--red-bg);
+    }
+
+    .ac-veh-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .ac-reg {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: rgba(255,255,255,.75);
+        color: #444;
+        padding: 2px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .ac-type-badge {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 20px;
+        white-space: nowrap;
+        background: rgba(24,95,165,.12);
+        color: var(--blue);
+    }
+
+    .alloc-card.overdue .ac-type-badge {
+        background: rgba(163,45,45,.12);
+        color: var(--red);
+    }
+
+    /* Status pill on top-right */
+    .ac-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .ac-status-pill::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+    .pill-inuse {
+        background: var(--blue-bg);
+        color: var(--blue);
+    }
+
+        .pill-inuse::before {
+            background: var(--blue);
+        }
+
+    .pill-overdue {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+        .pill-overdue::before {
+            background: var(--red);
+        }
+
+    /* Card body */
+    .ac-body {
+        padding: 14px 18px;
+    }
+
+    .ac-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid #f1efe8;
+    }
+
+        .ac-row:last-child {
+            border-bottom: none;
+        }
+
+        .ac-row .ac-key {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .ac-row .ac-val {
+            color: var(--text);
+            font-weight: 600;
+            text-align: right;
+            max-width: 60%;
+        }
+
+    /* User row */
+    .ac-user-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        background: var(--gray-bg);
+        border-top: 1px solid var(--border);
+    }
+
+    .ac-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--blue-bg);
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .alloc-card.overdue .ac-avatar {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+    .ac-uname {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .ac-uemp {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    /* Countdown bar */
+    .ac-progress-wrap {
+        padding: 10px 18px 14px;
+        border-top: 1px solid var(--border);
+    }
+
+    .ac-prog-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .ac-prog-bar {
+        height: 5px;
+        background: #e8e6de;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .ac-prog-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width .4s;
+    }
+
+    .fill-ok {
+        background: var(--green);
+    }
+
+    .fill-warning {
+        background: var(--amber);
+    }
+
+    .fill-overdue {
+        background: var(--red);
+    }
+
+    /* Action footer */
+    .ac-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 8px;
+    }
+
+    .act-btn {
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: opacity .15s;
+        flex: 1;
+        text-align: center;
+    }
+
+        .act-btn:hover {
+            opacity: .82;
+        }
+
+    .btn-complete {
+        background: var(--green-bg);
+        color: var(--green);
+    }
+
+    .btn-detail {
+        background: var(--gray-bg);
+        color: var(--muted);
+        border: 1px solid var(--border);
+    }
+
+    /* Empty */
+    .alloc-empty {
+        text-align: center;
+        padding: 60px 24px;
+        color: var(--muted);
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+    }
+
+        .alloc-empty .ei {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .alloc-empty p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* Flash */
+    .flash-ok {
+        background: var(--green-bg);
+        color: var(--green);
+        border: 1px solid #9fe1cb;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .flash-err {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #f7c1c1;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Detail modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(44,44,42,.45);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal-box {
+        background: #fff;
+        border-radius: var(--radius);
+        width: 100%;
+        max-width: 480px;
+        margin: 16px;
+        overflow: hidden;
+        animation: slideUp .2s ease;
+    }
+    @@keyframes slideUp {
+        from
+
+    {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    }
+
+    .modal-header {
+        background: var(--blue-bg);
+        padding: 16px 20px;
+        border-bottom: 1px solid #b5d4f4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .modal-header h5 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--muted);
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 9px 0;
+        border-bottom: 1px solid #f1efe8;
+        font-size: 13px;
+    }
+
+        .modal-row:last-child {
+            border-bottom: none;
+        }
+
+        .modal-row .mk {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .modal-row .mv {
+            color: var(--text);
+            font-weight: 700;
+            text-align: right;
+            max-width: 60%;
+        }
+</style>
 
 <div class="ab-shell">
     @await Html.PartialAsync("_AdminSidebar")
     <div class="ab-main">
         @await Html.PartialAsync("_AdminTopbar")
         <div class="ab-content">
+
             <div class="page-header">
-                <div class="page-title">🔑 Allocated Vehicle</div>
-                <div class="page-sub">Hello! Allocated Vehicle page — your content goes here.</div>
+                <div class="page-title">🔑 Allocated Vehicles</div>
+                <div class="page-sub">All vehicles currently checked out and in use by employees.</div>
             </div>
+
+            @* Flash *@
+            @if (TempData["Success"] != null)
+            {
+                <div class="flash-ok">✅ @TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="flash-err">⚠️ @TempData["Error"]</div>
+            }
+
+            @* ── Summary strip ── *@
+            <div class="alloc-summary">
+                <div class="alloc-stat as-total">
+                    <div class="as-label">Total Allocated</div>
+                    <div class="as-num">@Model.TotalAllocated</div>
+                    <div class="as-sub">Approved &amp; out</div>
+                </div>
+                <div class="alloc-stat as-inuse">
+                    <div class="as-label">In Use</div>
+                    <div class="as-num">@Model.TotalInUse</div>
+                    <div class="as-sub">Within time</div>
+                </div>
+                <div class="alloc-stat as-overdue">
+                    <div class="as-label">Overdue</div>
+                    <div class="as-num">@Model.TotalOverdue</div>
+                    <div class="as-sub">Past return time</div>
+                </div>
+            </div>
+
+            @* ── Filter bar ── *@
+            <div class="filter-bar">
+                <input class="filter-search" id="allocSearch" type="text"
+                       placeholder="🔍  Search by employee, vehicle, reg no…" />
+                <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+                <button class="filter-btn f-inuse" onclick="setFilter('inuse', this)">In Use</button>
+                <button class="filter-btn f-overdue" onclick="setFilter('overdue', this)">Overdue</button>
+            </div>
+
+            @* ── Cards ── *@
+            @if (!Model.AllocatedRequests.Any())
+            {
+                <div class="alloc-empty">
+                    <div class="ei">🚘</div>
+                    <p>No vehicles are currently allocated. All fleet is available.</p>
+                </div>
+            }
+            else
+            {
+                <div class="alloc-grid" id="allocGrid">
+                    @foreach (var r in Model.AllocatedRequests)
+                    {
+                        var now = DateTime.Now;
+                        bool overdue = r.EndTime < now;
+
+                        double totalMins = (r.EndTime - r.StartTime).TotalMinutes;
+                        double elapsedMins = (now - r.StartTime).TotalMinutes;
+                        int pct = Math.Min(100, (int)(elapsedMins / totalMins * 100));
+                        pct = Math.Max(0, pct);
+
+                        string fillClass = overdue ? "fill-overdue"
+                        : pct > 75 ? "fill-warning"
+                        : "fill-ok";
+
+                        double hrs = (r.EndTime - r.StartTime).TotalHours;
+                        string dur = hrs >= 24
+                        ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
+                        : hrs >= 1
+                        ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
+                        : $"{(int)(hrs * 60)}m";
+
+                        string initials = string.Join("", r.UserName
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Take(2).Select(w => w[0])).ToUpper();
+
+                        string pillClass = overdue ? "pill-overdue" : "pill-inuse";
+                        string pillLabel = overdue ? "Overdue" : "In Use";
+                        string cardClass = overdue ? "alloc-card overdue" : "alloc-card";
+                        string filterTag = overdue ? "overdue" : "inuse";
+
+                        // Time remaining or overdue by
+                        string timeLabel;
+                        if (overdue)
+                        {
+                            var over = now - r.EndTime;
+                            timeLabel = over.TotalHours >= 1
+                            ? $"Overdue by {(int)over.TotalHours}h {over.Minutes}m"
+                            : $"Overdue by {over.Minutes}m";
+                        }
+                        else
+                        {
+                            var left = r.EndTime - now;
+                            timeLabel = left.TotalHours >= 1
+                            ? $"{(int)left.TotalHours}h {left.Minutes}m remaining"
+                            : $"{left.Minutes}m remaining";
+                        }
+
+                        <div class="@cardClass"
+                             data-filter="@filterTag"
+                             data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower()">
+
+                            @* Top band *@
+                            <div class="ac-top">
+                                <div>
+                                    <div class="ac-veh-name">@r.VehicleName</div>
+                                    <span class="ac-reg">@r.RegistrationNumber</span>
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                                    <span class="ac-type-badge">@r.VehicleType</span>
+                                    <span class="ac-status-pill @pillClass">@pillLabel</span>
+                                </div>
+                            </div>
+
+                            @* Details *@
+                            <div class="ac-body">
+                                <div class="ac-row">
+                                    <span class="ac-key">Start</span>
+                                    <span class="ac-val">@r.StartTime.ToString("dd MMM yy, hh:mm tt")</span>
+                                </div>
+                                <div class="ac-row">
+                                    <span class="ac-key">Due Return</span>
+                                    <span class="ac-val" style="color: @(overdue ? "var(--red)" : "var(--text)")">
+                                        @r.EndTime.ToString("dd MMM yy, hh:mm tt")
+                                    </span>
+                                </div>
+                                <div class="ac-row">
+                                    <span class="ac-key">Duration</span>
+                                    <span class="ac-val">@dur</span>
+                                </div>
+                                <div class="ac-row">
+                                    <span class="ac-key">Purpose</span>
+                                    <span class="ac-val" style="font-weight:400; color:var(--muted);">
+                                        @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
+                                    </span>
+                                </div>
+                            </div>
+
+                            @* Progress bar *@
+                            <div class="ac-progress-wrap">
+                                <div class="ac-prog-label">
+                                    <span>@(overdue ? "⚠ " : "⏱ ")@timeLabel</span>
+                                    <span>@pct%</span>
+                                </div>
+                                <div class="ac-prog-bar">
+                                    <div class="ac-prog-fill @fillClass" style="width:@pct%"></div>
+                                </div>
+                            </div>
+
+                            @* Employee row *@
+                            <div class="ac-user-row">
+                                <div class="ac-avatar">@initials</div>
+                                <div style="flex:1;">
+                                    <div class="ac-uname">@r.UserName</div>
+                                    <div class="ac-uemp">@r.EmployeeNumber &nbsp;·&nbsp; @r.UserMobile</div>
+                                </div>
+                            </div>
+
+                            @* Actions *@
+                            <div class="ac-footer">
+                                <form asp-action="CompleteRequest" asp-controller="Autobase"
+                                      method="post" style="flex:1;">
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="act-btn btn-complete"
+                                            style="width:100%;">
+                                        ✔ Mark as Returned
+                                    </button>
+                                </form>
+                                <button class="act-btn btn-detail"
+                                        onclick="openDetail(
+                                                    '@r.VehicleName','@r.RegistrationNumber','@r.VehicleType',
+                                                    '@r.UserName','@r.EmployeeNumber','@r.UserMobile',
+                                                    '@r.StartTime.ToString("dd MMM yyyy, hh:mm tt")',
+                                                    '@r.EndTime.ToString("dd MMM yyyy, hh:mm tt")',
+                                                    '@dur','@r.Purpose','@r.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")'
+                                                )">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
         </div>
     </div>
 </div>
+
+@* ── Detail Modal ── *@
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h5 id="dModalTitle">Allocation Details</h5>
+            <button class="modal-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-row"><span class="mk">Vehicle</span>    <span class="mv" id="dm-veh"></span></div>
+            <div class="modal-row"><span class="mk">Reg No</span>     <span class="mv" id="dm-reg" style="font-family:monospace;"></span></div>
+            <div class="modal-row"><span class="mk">Type</span>       <span class="mv" id="dm-type"></span></div>
+            <div class="modal-row"><span class="mk">Employee</span>   <span class="mv" id="dm-name"></span></div>
+            <div class="modal-row"><span class="mk">Emp No</span>     <span class="mv" id="dm-emp"></span></div>
+            <div class="modal-row"><span class="mk">Mobile</span>     <span class="mv" id="dm-mob"></span></div>
+            <div class="modal-row"><span class="mk">Start</span>      <span class="mv" id="dm-start"></span></div>
+            <div class="modal-row"><span class="mk">Due Return</span> <span class="mv" id="dm-end"></span></div>
+            <div class="modal-row"><span class="mk">Duration</span>   <span class="mv" id="dm-dur"></span></div>
+            <div class="modal-row"><span class="mk">Purpose</span>    <span class="mv" id="dm-pur"></span></div>
+            <div class="modal-row"><span class="mk">Requested On</span><span class="mv" id="dm-created"></span></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        /* ── Filter + Search ── */
+        let activeFilter = 'all';
+
+        function setFilter(f, btn) {
+            activeFilter = f;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        document.getElementById('allocSearch').addEventListener('input', applyFilters);
+
+        function applyFilters() {
+            const q = document.getElementById('allocSearch').value.toLowerCase().trim();
+            document.querySelectorAll('#allocGrid .alloc-card').forEach(card => {
+                const filterOk = activeFilter === 'all' || card.dataset.filter === activeFilter;
+                const searchOk = !q || card.dataset.search.includes(q);
+                card.style.display = filterOk && searchOk ? '' : 'none';
+            });
+        }
+
+        /* ── Detail modal ── */
+        function openDetail(veh, reg, type, name, emp, mob, start, end, dur, pur, created) {
+            document.getElementById('dm-veh').textContent     = veh;
+            document.getElementById('dm-reg').textContent     = reg;
+            document.getElementById('dm-type').textContent    = type;
+            document.getElementById('dm-name').textContent    = name;
+            document.getElementById('dm-emp').textContent     = emp;
+            document.getElementById('dm-mob').textContent     = mob;
+            document.getElementById('dm-start').textContent   = start;
+            document.getElementById('dm-end').textContent     = end;
+            document.getElementById('dm-dur').textContent     = dur;
+            document.getElementById('dm-pur').textContent     = pur || '—';
+            document.getElementById('dm-created').textContent = created;
+            document.getElementById('detailModal').classList.add('open');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('open');
+        }
+
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetail();
+        });
+    </script>
+}

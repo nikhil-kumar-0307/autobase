@@ -1,18 +1,607 @@
-﻿@{
+﻿@model autobase.Models.ViewModels.SeeRequestViewModel
+@{
     ViewData["Title"] = "See Requests";
     Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
 }
 <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+
+<style>
+    :root {
+        --green: #1d9e75;
+        --green-bg: #e1f5ee;
+        --blue: #185fa5;
+        --blue-bg: #e6f1fb;
+        --amber: #ba7517;
+        --amber-bg: #faeeda;
+        --red: #a32d2d;
+        --red-bg: #fcebeb;
+        --gray-bg: #f9f8f4;
+        --border: #e8e6de;
+        --text: #2c2c2a;
+        --muted: #888780;
+        --radius: 14px;
+    }
+
+    /* ── Summary strip ── */
+    .req-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 14px;
+        margin-bottom: 26px;
+    }
+
+    .req-stat {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .req-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+    .rs-total::before {
+        background: #888780;
+    }
+
+    .rs-pending::before {
+        background: var(--amber);
+    }
+
+    .rs-approved::before {
+        background: var(--green);
+    }
+
+    .rs-rejected::before {
+        background: var(--red);
+    }
+
+    .rs-completed::before {
+        background: var(--blue);
+    }
+
+    .req-stat .rs-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .req-stat .rs-num {
+        font-size: 32px;
+        font-weight: 700;
+        font-family: Georgia, serif;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 9px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text);
+        outline: none;
+        transition: border-color .2s;
+    }
+
+        .filter-search:focus {
+            border-color: var(--blue);
+        }
+
+    .filter-btn {
+        padding: 8px 15px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all .15s;
+        white-space: nowrap;
+    }
+
+        .filter-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-bg);
+        }
+
+        .filter-btn.active {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-bg);
+        }
+
+        .filter-btn.f-pending.active {
+            border-color: var(--amber);
+            color: var(--amber);
+            background: var(--amber-bg);
+        }
+
+        .filter-btn.f-approved.active {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+
+        .filter-btn.f-rejected.active {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        .filter-btn.f-completed.active {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-bg);
+        }
+
+    /* ── Table card ── */
+    .req-table-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+
+    .req-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .req-table thead tr {
+            background: var(--gray-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .req-table th {
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .req-table tbody tr {
+            border-bottom: 1px solid #f1efe8;
+            transition: background .12s;
+        }
+
+            .req-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .req-table tbody tr:hover {
+                background: #fafaf7;
+            }
+
+        .req-table td {
+            padding: 11px 14px;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+    .reg-mono {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #f1efe8;
+        padding: 2px 7px;
+        border-radius: 4px;
+        color: #444;
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--blue-bg);
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .user-emp {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    /* Status badges */
+    .sbadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .sbadge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .sb-pending {
+        background: var(--amber-bg);
+        color: var(--amber);
+    }
+
+        .sb-pending::before {
+            background: var(--amber);
+        }
+
+    .sb-approved {
+        background: var(--green-bg);
+        color: var(--green);
+    }
+
+        .sb-approved::before {
+            background: var(--green);
+        }
+
+    .sb-rejected {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+        .sb-rejected::before {
+            background: var(--red);
+        }
+
+    .sb-completed {
+        background: var(--blue-bg);
+        color: var(--blue);
+    }
+
+        .sb-completed::before {
+            background: var(--blue);
+        }
+
+    /* Action buttons */
+    .act-btn {
+        padding: 5px 11px;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: opacity .15s;
+        white-space: nowrap;
+    }
+
+        .act-btn:hover {
+            opacity: .82;
+        }
+
+    .btn-approve {
+        background: var(--green-bg);
+        color: var(--green);
+    }
+
+    .btn-reject {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+    .btn-complete {
+        background: var(--blue-bg);
+        color: var(--blue);
+    }
+
+    .act-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    /* Duration chip */
+    .dur-chip {
+        font-weight: 700;
+        font-size: 12px;
+        color: var(--blue);
+    }
+
+    /* Empty */
+    .req-empty {
+        text-align: center;
+        padding: 52px 24px;
+        color: var(--muted);
+    }
+
+        .req-empty .ei {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+    /* Flash */
+    .flash-ok {
+        background: var(--green-bg);
+        color: var(--green);
+        border: 1px solid #9fe1cb;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .flash-err {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #f7c1c1;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
 
 <div class="ab-shell">
     @await Html.PartialAsync("_AdminSidebar")
     <div class="ab-main">
         @await Html.PartialAsync("_AdminTopbar")
         <div class="ab-content">
+
             <div class="page-header">
-                <div class="page-title">📋 See Requests</div>
-                <div class="page-sub">Hello! See Requests page — your content goes here.</div>
+                <div class="page-title">📋 Vehicle Requests</div>
+                <div class="page-sub">Review, approve or reject user vehicle requests.</div>
             </div>
+
+            @* Flash messages *@
+            @if (TempData["Success"] != null)
+            {
+                <div class="flash-ok">✅ @TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="flash-err">⚠️ @TempData["Error"]</div>
+            }
+
+            @* ── Summary strip ── *@
+            <div class="req-summary">
+                <div class="req-stat rs-total">
+                    <div class="rs-label">Total</div>
+                    <div class="rs-num">@Model.TotalCount</div>
+                </div>
+                <div class="req-stat rs-pending">
+                    <div class="rs-label">Pending</div>
+                    <div class="rs-num">@Model.PendingCount</div>
+                </div>
+                <div class="req-stat rs-approved">
+                    <div class="rs-label">Approved</div>
+                    <div class="rs-num">@Model.ApprovedCount</div>
+                </div>
+                <div class="req-stat rs-rejected">
+                    <div class="rs-label">Rejected</div>
+                    <div class="rs-num">@Model.RejectedCount</div>
+                </div>
+                <div class="req-stat rs-completed">
+                    <div class="rs-label">Completed</div>
+                    <div class="rs-num">@Model.CompletedCount</div>
+                </div>
+            </div>
+
+            @* ── Filter bar ── *@
+            <div class="filter-bar">
+                <input class="filter-search" id="reqSearch" type="text"
+                       placeholder="🔍  Search by name, vehicle, emp no, reg…" />
+                <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+                <button class="filter-btn f-pending" onclick="setFilter('pending',this)">Pending</button>
+                <button class="filter-btn f-approved" onclick="setFilter('approved',this)">Approved</button>
+                <button class="filter-btn f-rejected" onclick="setFilter('rejected',this)">Rejected</button>
+                <button class="filter-btn f-completed" onclick="setFilter('completed',this)">Completed</button>
+            </div>
+
+            @* ── Table ── *@
+            @if (!Model.AllRequests.Any())
+            {
+                <div class="req-table-card">
+                    <div class="req-empty">
+                        <div class="ei">📭</div>
+                        <p>No vehicle requests have been submitted yet.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="req-table-card">
+                    <div style="overflow-x: auto;">
+                        <table class="req-table" id="reqTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Employee</th>
+                                    <th>Vehicle</th>
+                                    <th>Reg No</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Duration</th>
+                                    <th>Purpose</th>
+                                    <th>Requested On</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int i = 1;
+                                }
+                                @foreach (var r in Model.AllRequests)
+                                {
+                                    double hrs = (r.EndTime - r.StartTime).TotalHours;
+                                    string dur = hrs >= 24
+                                    ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
+                                    : hrs >= 1
+                                    ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
+                                    : $"{(int)(hrs * 60)}m";
+
+                                    string sbClass = r.Status.ToLower() switch
+                                    {
+                                        "pending" => "sb-pending",
+                                        "approved" => "sb-approved",
+                                        "rejected" => "sb-rejected",
+                                        "completed" => "sb-completed",
+                                        _ => "sb-pending"
+                                    };
+
+                                    string initials = string.Join("", r.UserName
+                                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                    .Take(2).Select(w => w[0])).ToUpper();
+
+                                    <tr class="req-row"
+                                        data-status="@r.Status.ToLower()"
+                                        data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower()">
+
+                                        <td style="color:#b4b2a9; font-size:11px;">@i</td>
+
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar">@initials</div>
+                                                <div>
+                                                    <div class="user-name">@r.UserName</div>
+                                                    <div class="user-emp">@r.EmployeeNumber &nbsp;·&nbsp; @r.UserMobile</div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td style="font-weight: 600;">@r.VehicleName</td>
+
+                                        <td><span class="reg-mono">@r.RegistrationNumber</span></td>
+
+                                        <td style="font-size:12px; white-space:nowrap;">
+                                            @r.StartTime.ToString("dd MMM yy")<br />
+                                            <span style="color:var(--muted)">@r.StartTime.ToString("hh:mm tt")</span>
+                                        </td>
+
+                                        <td style="font-size:12px; white-space:nowrap;">
+                                            @r.EndTime.ToString("dd MMM yy")<br />
+                                            <span style="color:var(--muted)">@r.EndTime.ToString("hh:mm tt")</span>
+                                        </td>
+
+                                        <td><span class="dur-chip">@dur</span></td>
+
+                                        <td style="color:var(--muted); font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
+                                        </td>
+
+                                        <td style="font-size:11px; color:var(--muted); white-space:nowrap;">
+                                            @r.CreatedAt.ToString("dd MMM yy, hh:mm tt")
+                                        </td>
+
+                                        <td><span class="sbadge @sbClass">@r.Status</span></td>
+
+                                        <td>
+                                            <div class="act-group">
+                                                @if (r.Status == "Pending")
+                                                {
+                                                    <form asp-action="ApproveRequest" asp-controller="Autobase" method="post" style="display:inline;">
+                                                        <input type="hidden" name="id" value="@r.Id" />
+                                                        <button type="submit" class="act-btn btn-approve">✔ Approve</button>
+                                                    </form>
+                                                    <form asp-action="RejectRequest" asp-controller="Autobase" method="post" style="display:inline;">
+                                                        <input type="hidden" name="id" value="@r.Id" />
+                                                        <button type="submit" class="act-btn btn-reject">✘ Reject</button>
+                                                    </form>
+                                                }
+                                                else if (r.Status == "Approved")
+                                                {
+                                                    <form asp-action="CompleteRequest" asp-controller="Autobase" method="post" style="display:inline;">
+                                                        <input type="hidden" name="id" value="@r.Id" />
+                                                        <button type="submit" class="act-btn btn-complete">✔ Mark Returned</button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span style="font-size:11px; color:var(--muted);">No actions</span>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        let activeFilter = 'all';
+
+        function setFilter(status, btn) {
+            activeFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        document.getElementById('reqSearch').addEventListener('input', applyFilters);
+
+        function applyFilters() {
+            const q = document.getElementById('reqSearch').value.toLowerCase().trim();
+            document.querySelectorAll('.req-row').forEach(row => {
+                const statusOk  = activeFilter === 'all' || row.dataset.status === activeFilter;
+                const searchOk  = !q || row.dataset.search.includes(q);
+                row.style.display = statusOk && searchOk ? '' : 'none';
+            });
+        }
+    </script>
+}

@@ -1,28 +1,803 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+﻿@model autobase.Models.ViewModels.UserDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard";
 }
 
-<div class="container mt-4">
-    <div class="alert alert-success">
-        <h4>👋 Welcome, @ViewBag.Name</h4>
-        <p class="mb-0">Role: <strong>@ViewBag.Role</strong> &nbsp;|&nbsp; Emp No: <strong>@ViewBag.EmpNo</strong></p>
+<style>
+    :root {
+        --green: #1d9e75;
+        --green-bg: #e1f5ee;
+        --blue: #185fa5;
+        --blue-bg: #e6f1fb;
+        --amber: #ba7517;
+        --amber-bg: #faeeda;
+        --red: #a32d2d;
+        --red-bg: #fcebeb;
+        --gray-bg: #f9f8f4;
+        --border: #e8e6de;
+        --text: #2c2c2a;
+        --muted: #888780;
+        --radius: 14px;
+    }
+
+    body {
+        background: #f4f3ee;
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    /* ── Layout ── */
+    .dash-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 28px 20px;
+    }
+
+    /* ── Top bar ── */
+    .dash-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 24px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .dash-greeting h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+
+    .dash-greeting p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0;
+    }
+
+    .dash-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .meta-pill {
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+        .meta-pill span {
+            color: var(--text);
+        }
+
+    .logout-btn {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #f7c1c1;
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background .15s;
+    }
+
+        .logout-btn:hover {
+            background: #f9d6d6;
+            color: var(--red);
+        }
+
+    /* ── Alert banners ── */
+    .flash-success, .flash-error {
+        border-radius: 10px;
+        padding: 13px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .flash-success {
+        background: var(--green-bg);
+        color: var(--green);
+        border: 1px solid #9fe1cb;
+    }
+
+    .flash-error {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #f7c1c1;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+    /* ── Vehicle grid ── */
+    .vehicle-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+        margin-bottom: 36px;
+    }
+
+    .vehicle-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: box-shadow .15s, transform .15s;
+    }
+
+        .vehicle-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,0,0,.07);
+        }
+
+    .vc-top {
+        background: var(--green-bg);
+        padding: 18px 20px 14px;
+        position: relative;
+    }
+
+    .vc-type-badge {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        background: rgba(29,158,117,.15);
+        color: var(--green);
+        padding: 3px 9px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .vc-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 4px;
+    }
+
+    .vc-reg {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        background: rgba(255,255,255,.7);
+        color: #444441;
+        padding: 3px 8px;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    .vc-avail-dot {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 0 3px rgba(29,158,117,.25);
+    }
+
+    .vc-body {
+        padding: 14px 20px;
+    }
+
+    .vc-detail {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+        .vc-detail strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+    .request-btn {
+        display: block;
+        width: 100%;
+        margin-top: 14px;
+        padding: 10px;
+        background: var(--green);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .15s;
+        text-align: center;
+    }
+
+        .request-btn:hover {
+            background: #0f6e56;
+        }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 44px 24px;
+        color: var(--muted);
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 36px;
+    }
+
+        .empty-state .ei {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* ── My Requests table ── */
+    .req-table-wrap {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 36px;
+    }
+
+    .req-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .req-table thead tr {
+            background: var(--gray-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .req-table th {
+            padding: 11px 16px;
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .req-table tbody tr {
+            border-bottom: 1px solid #f1efe8;
+            transition: background .12s;
+        }
+
+            .req-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .req-table tbody tr:hover {
+                background: var(--gray-bg);
+            }
+
+        .req-table td {
+            padding: 11px 16px;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+    .req-reg {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #f1efe8;
+        padding: 2px 7px;
+        border-radius: 4px;
+        color: #444;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+    .sb-pending {
+        background: var(--amber-bg);
+        color: var(--amber);
+    }
+
+        .sb-pending::before {
+            background: var(--amber);
+        }
+
+    .sb-approved {
+        background: var(--green-bg);
+        color: var(--green);
+    }
+
+        .sb-approved::before {
+            background: var(--green);
+        }
+
+    .sb-rejected {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+        .sb-rejected::before {
+            background: var(--red);
+        }
+
+    .sb-completed {
+        background: #f1efe8;
+        color: var(--muted);
+    }
+
+        .sb-completed::before {
+            background: var(--muted);
+        }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(44,44,42,.45);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal-box {
+        background: #fff;
+        border-radius: var(--radius);
+        width: 100%;
+        max-width: 460px;
+        margin: 16px;
+        overflow: hidden;
+        animation: slideUp .2s ease;
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        background: var(--green-bg);
+        padding: 18px 22px;
+        border-bottom: 1px solid #9fe1cb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .modal-header h5 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text);
+        }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--muted);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 22px;
+    }
+
+    .modal-vehicle-info {
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+
+        .modal-vehicle-info strong {
+            font-size: 15px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            background: #fff;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+            .form-group input:focus,
+            .form-group textarea:focus {
+                border-color: var(--green);
+            }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .duration-display {
+        background: var(--green-bg);
+        border: 1px solid #9fe1cb;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--green);
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--green);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .15s;
+    }
+
+        .submit-btn:hover {
+            background: #0f6e56;
+        }
+</style>
+
+<div class="dash-wrap">
+
+    @* ── Flash messages ── *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="flash-success">✅ @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="flash-error">⚠️ @TempData["Error"]</div>
+    }
+
+    @* ── Top bar ── *@
+    <div class="dash-topbar">
+        <div class="dash-greeting">
+            <h2>👋 Welcome back, @Model.UserName</h2>
+            <p>Here are the vehicles available for you to request today.</p>
+        </div>
+        <div class="dash-meta">
+            <div class="meta-pill">Emp No: <span>@Model.EmployeeNumber</span></div>
+            <div class="meta-pill">Mobile: <span>@Model.Mobile</span></div>
+            <div class="meta-pill">Role: <span>@Model.Role</span></div>
+        </div>
+        <a asp-controller="Account" asp-action="Logout" class="logout-btn">🚪 Logout</a>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card border-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">📋 My Profile</h5>
-                    <p><strong>Name:</strong> @ViewBag.Name</p>
-                    <p><strong>Employee No:</strong> @ViewBag.EmpNo</p>
-                    <p><strong>Mobile:</strong> @ViewBag.Mobile</p>
-                    <p><strong>Role:</strong> @ViewBag.Role</p>
+    @* ── Available Vehicles ── *@
+    <div class="section-title">🚗 Available Vehicles (@Model.AvailableVehicles.Count)</div>
+
+    @if (!Model.AvailableVehicles.Any())
+    {
+        <div class="empty-state">
+            <div class="ei">🚘</div>
+            <p>No vehicles are available right now. Please check back later.</p>
+        </div>
+    }
+    else
+    {
+        <div class="vehicle-grid">
+            @foreach (var v in Model.AvailableVehicles)
+            {
+                <div class="vehicle-card">
+                    <div class="vc-top">
+                        <div class="vc-avail-dot"></div>
+                        <div class="vc-type-badge">@v.VehicleType</div>
+                        <div class="vc-name">@v.VehicleName</div>
+                        <div class="vc-reg">@v.RegistrationNumber</div>
+                    </div>
+                    <div class="vc-body">
+                        <div class="vc-detail">
+                            <span>Year</span>
+                            <strong>@v.Year</strong>
+                        </div>
+                        <div class="vc-detail">
+                            <span>Status</span>
+                            <strong style="color: var(--green);">Available</strong>
+                        </div>
+                        @if (!string.IsNullOrEmpty(v.Notes))
+                        {
+                            <div class="vc-detail">
+                                <span>Notes</span>
+                                <strong style="font-size:11px; max-width:140px; text-align:right;">@v.Notes</strong>
+                            </div>
+                        }
+                        <button class="request-btn"
+                                onclick="openModal(@v.Id, '@v.VehicleName', '@v.RegistrationNumber', '@v.VehicleType')">
+                            + Request This Vehicle
+                        </button>
+                    </div>
                 </div>
+            }
+        </div>
+    }
+
+    @* ── My Requests ── *@
+    <div class="section-title">📋 My Requests (@Model.MyRequests.Count)</div>
+
+    @if (!Model.MyRequests.Any())
+    {
+        <div class="empty-state">
+            <div class="ei">📭</div>
+            <p>You haven't made any vehicle requests yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="req-table-wrap">
+            <table class="req-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vehicle</th>
+                        <th>Reg No</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Duration</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+                        <th>Action</th>   @* ← new column *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                    }
+                    @foreach (var r in Model.MyRequests)
+                    {
+                        string sbClass = r.Status.ToLower() switch
+                        {
+                            "pending" => "sb-pending",
+                            "approved" => "sb-approved",
+                            "rejected" => "sb-rejected",
+                            "completed" => "sb-completed",
+                            _ => "sb-pending"
+                        };
+                        double hrs = (r.EndTime - r.StartTime).TotalHours;
+                        string duration = hrs >= 24
+                        ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
+                        : $"{hrs:F1} hrs";
+
+                        <tr>
+                            <td style="color:#b4b2a9; font-size:12px;">@i</td>
+                            <td style="font-weight:600;">@r.VehicleName</td>
+                            <td><span class="req-reg">@r.RegistrationNumber</span></td>
+                            <td style="font-size:12px;">@r.StartTime.ToString("dd MMM, hh:mm tt")</td>
+                            <td style="font-size:12px;">@r.EndTime.ToString("dd MMM, hh:mm tt")</td>
+                            <td style="font-weight:700; color: var(--blue); font-size:12px;">@duration</td>
+                            <td style="color:var(--muted); font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
+                            </td>
+                            <td><span class="status-badge @sbClass">@r.Status</span></td>
+
+                            @* ── Action column ── *@
+                            <td>
+                                @if (r.Status == "Approved")
+                                {
+                                    <form asp-controller="Home" asp-action="ReturnVehicle" method="post"
+                                          onsubmit="return confirm('Are you sure you want to return @r.VehicleName?')">
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <button type="submit" style="
+                                        background: #e1f5ee;
+                                        color: #1d9e75;
+                                        border: 1px solid #9fe1cb;
+                                        border-radius: 7px;
+                                        padding: 5px 12px;
+                                        font-size: 11px;
+                                        font-weight: 700;
+                                        cursor: pointer;
+                                        white-space: nowrap;
+                                        transition: opacity .15s;">
+                                            ✔ Return Vehicle
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="font-size:11px; color:#b4b2a9;">—</span>
+                                }
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@* ── Request Modal ── *@
+<div class="modal-overlay" id="requestModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h5>🚗 Request Vehicle</h5>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-vehicle-info">
+                <strong id="modalVehicleName">—</strong>
+                <span id="modalVehicleReg" style="font-family: monospace; font-size:12px; background:#e8e6de; padding:2px 7px; border-radius:4px;"></span>
+                &nbsp;
+                <span id="modalVehicleType" style="font-size:12px; color: var(--muted);"></span>
             </div>
+
+            <form asp-controller="Home" asp-action="RequestVehicle" method="post">
+                <input type="hidden" name="VehicleId" id="modalVehicleId" />
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date & Time</label>
+                        <input type="datetime-local" name="StartTime" id="startTime" required
+                               onchange="updateDuration()" />
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time</label>
+                        <input type="datetime-local" name="EndTime" id="endTime" required
+                               onchange="updateDuration()" />
+                    </div>
+                </div>
+
+                <div class="duration-display" id="durationDisplay">
+                    Select start and end time to see duration
+                </div>
+
+                <div class="form-group">
+                    <label>Purpose / Destination</label>
+                    <textarea name="Purpose" rows="3"
+                              placeholder="e.g. Client visit to Chennai airport, Site inspection at Tambaram..."
+                              required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Request →</button>
+            </form>
         </div>
     </div>
-
-    <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger mt-3">
-        🚪 Logout
-    </a>
 </div>
+
+@section Scripts {
+    <script>
+        function openModal(id, name, reg, type) {
+            document.getElementById('modalVehicleId').value  = id;
+            document.getElementById('modalVehicleName').textContent = name;
+            document.getElementById('modalVehicleReg').textContent  = reg;
+            document.getElementById('modalVehicleType').textContent = type;
+
+            // Default start = now, end = now + 2 hours
+            const now = new Date();
+            const later = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            document.getElementById('startTime').value = toLocalISO(now);
+            document.getElementById('endTime').value   = toLocalISO(later);
+            updateDuration();
+
+            document.getElementById('requestModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.remove('open');
+        }
+
+        // Close on backdrop click
+        document.getElementById('requestModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function toLocalISO(date) {
+            const pad = n => String(n).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function updateDuration() {
+            const s = document.getElementById('startTime').value;
+            const e = document.getElementById('endTime').value;
+            const el = document.getElementById('durationDisplay');
+            if (!s || !e) return;
+            const diffMs = new Date(e) - new Date(s);
+            if (diffMs <= 0) {
+                el.style.background = '#fcebeb';
+                el.style.color = '#a32d2d';
+                el.style.borderColor = '#f7c1c1';
+                el.textContent = '⚠️ End time must be after start time';
+                return;
+            }
+            el.style.background = '#e1f5ee';
+            el.style.color = '#1d9e75';
+            el.style.borderColor = '#9fe1cb';
+            const hrs  = Math.floor(diffMs / 3600000);
+            const mins = Math.floor((diffMs % 3600000) / 60000);
+            el.textContent = hrs > 0
+                ? `⏱ Duration: ${hrs} hour${hrs !== 1 ? 's' : ''} ${mins > 0 ? mins + ' min' : ''}`
+                : `⏱ Duration: ${mins} minute${mins !== 1 ? 's' : ''}`;
+        }
+    </script>
+}

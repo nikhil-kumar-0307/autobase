@@ -1,18 +1,579 @@
-﻿@{
-    ViewData["Title"] = "Available Vehicle";
+﻿@model autobase.Models.ViewModels.AvailableVehicleViewModel
+@{
+    ViewData["Title"] = "Available Vehicles";
     Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
 }
+
 <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+
+<style>
+    /* ── Fleet page variables ── */
+    :root {
+        --fleet-green: #1d9e75;
+        --fleet-green-bg: #e1f5ee;
+        --fleet-blue: #185fa5;
+        --fleet-blue-bg: #e6f1fb;
+        --fleet-amber: #ba7517;
+        --fleet-amber-bg: #faeeda;
+        --fleet-gray: #5f5e5a;
+        --fleet-gray-bg: #f1efe8;
+        --fleet-red: #a32d2d;
+        --fleet-red-bg: #fcebeb;
+        --radius-card: 14px;
+        --radius-badge: 6px;
+    }
+
+    /* ── Summary strip ── */
+    .fleet-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .fleet-stat {
+        background: #fff;
+        border: 1px solid #e8e6de;
+        border-radius: var(--radius-card);
+        padding: 18px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .fleet-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .fleet-stat.s-total::before {
+            background: #888780;
+        }
+
+        .fleet-stat.s-avail::before {
+            background: var(--fleet-green);
+        }
+
+        .fleet-stat.s-inuse::before {
+            background: var(--fleet-blue);
+        }
+
+        .fleet-stat.s-maint::before {
+            background: var(--fleet-amber);
+        }
+
+        .fleet-stat .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: #888780;
+            margin-bottom: 8px;
+        }
+
+        .fleet-stat .stat-num {
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1;
+            font-family: 'Georgia', serif;
+            color: #2c2c2a;
+        }
+
+        .fleet-stat .stat-sub {
+            font-size: 12px;
+            color: #888780;
+            margin-top: 4px;
+        }
+
+    /* ── Filter bar ── */
+    .fleet-filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .fleet-search {
+        flex: 1;
+        min-width: 220px;
+        padding: 9px 14px;
+        border: 1px solid #d3d1c7;
+        border-radius: 8px;
+        font-size: 13px;
+        background: #fff;
+        color: #2c2c2a;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+        .fleet-search:focus {
+            border-color: var(--fleet-blue);
+        }
+
+    .fleet-filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #d3d1c7;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        color: #5f5e5a;
+        cursor: pointer;
+        transition: all .15s;
+        white-space: nowrap;
+    }
+
+        .fleet-filter-btn:hover,
+        .fleet-filter-btn.active {
+            border-color: var(--fleet-blue);
+            color: var(--fleet-blue);
+            background: var(--fleet-blue-bg);
+        }
+
+    /* ── Group card ── */
+    .vehicle-group {
+        background: #fff;
+        border: 1px solid #e8e6de;
+        border-radius: var(--radius-card);
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
+
+    .group-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        background: #f9f8f4;
+        border-bottom: 1px solid #e8e6de;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .group-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: var(--fleet-blue-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .group-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2c2c2a;
+        flex: 1;
+    }
+
+    .group-pills {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .gpill {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .04em;
+    }
+
+    .gpill-total {
+        background: var(--fleet-gray-bg);
+        color: var(--fleet-gray);
+    }
+
+    .gpill-avail {
+        background: var(--fleet-green-bg);
+        color: var(--fleet-green);
+    }
+
+    .gpill-inuse {
+        background: var(--fleet-blue-bg);
+        color: var(--fleet-blue);
+    }
+
+    .gpill-maint {
+        background: var(--fleet-amber-bg);
+        color: var(--fleet-amber);
+    }
+
+    .group-chevron {
+        font-size: 12px;
+        color: #888780;
+        transition: transform .2s;
+        margin-left: 4px;
+    }
+
+    .vehicle-group.collapsed .group-chevron {
+        transform: rotate(-90deg);
+    }
+
+    /* ── Vehicle table ── */
+    .vehicle-table-wrap {
+        overflow-x: auto;
+    }
+
+    .vehicle-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .vehicle-table thead tr {
+            background: #fafaf7;
+            border-bottom: 1px solid #e8e6de;
+        }
+
+        .vehicle-table th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: #888780;
+            white-space: nowrap;
+        }
+
+        .vehicle-table tbody tr {
+            border-bottom: 1px solid #f1efe8;
+            transition: background .12s;
+        }
+
+            .vehicle-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .vehicle-table tbody tr:hover {
+                background: #fafaf7;
+            }
+
+        .vehicle-table td {
+            padding: 11px 16px;
+            color: #2c2c2a;
+            vertical-align: middle;
+        }
+
+    .veh-name {
+        font-weight: 600;
+        color: #2c2c2a;
+    }
+
+    .veh-reg {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        background: #f1efe8;
+        color: #444441;
+        padding: 3px 8px;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .sb-available {
+        background: var(--fleet-green-bg);
+        color: var(--fleet-green);
+    }
+
+        .sb-available::before {
+            background: var(--fleet-green);
+        }
+
+    .sb-inuse {
+        background: var(--fleet-blue-bg);
+        color: var(--fleet-blue);
+    }
+
+        .sb-inuse::before {
+            background: var(--fleet-blue);
+        }
+
+    .sb-maintenance {
+        background: var(--fleet-amber-bg);
+        color: var(--fleet-amber);
+    }
+
+        .sb-maintenance::before {
+            background: var(--fleet-amber);
+        }
+
+    .sb-other {
+        background: var(--fleet-gray-bg);
+        color: var(--fleet-gray);
+    }
+
+        .sb-other::before {
+            background: var(--fleet-gray);
+        }
+
+    /* ── Empty state ── */
+    .fleet-empty {
+        text-align: center;
+        padding: 52px 24px;
+        color: #888780;
+    }
+
+        .fleet-empty .empty-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .fleet-empty p {
+            font-size: 14px;
+        }
+
+    /* ── Collapsed body ── */
+    .group-body {
+        display: block;
+    }
+
+    .vehicle-group.collapsed .group-body {
+        display: none;
+    }
+
+    /* ── Progress bar ── */
+    .avail-bar-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .avail-bar {
+        flex: 1;
+        height: 5px;
+        background: #e8e6de;
+        border-radius: 3px;
+        overflow: hidden;
+        min-width: 60px;
+    }
+
+    .avail-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: var(--fleet-green);
+        transition: width .4s ease;
+    }
+
+    .avail-pct {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--fleet-green);
+        min-width: 30px;
+        text-align: right;
+    }
+</style>
 
 <div class="ab-shell">
     @await Html.PartialAsync("_AdminSidebar")
     <div class="ab-main">
         @await Html.PartialAsync("_AdminTopbar")
         <div class="ab-content">
-            <div class="page-header">
-                <div class="page-title">✅ Available Vehicle</div>
-                <div class="page-sub">Hello! Available Vehicle page — your content goes here.</div>
+
+            <!-- Page header -->
+            <div class="page-header" style="margin-bottom: 24px;">
+                <div class="page-title">Fleet Overview</div>
+                <div class="page-sub">Live inventory of all vehicles grouped by type — with availability breakdown.</div>
             </div>
+
+            <!-- ── Summary Cards ── -->
+            <div class="fleet-summary">
+                <div class="fleet-stat s-total">
+                    <div class="stat-label">Total Fleet</div>
+                    <div class="stat-num">@Model.TotalVehicles</div>
+                    <div class="stat-sub">Active vehicles</div>
+                </div>
+                <div class="fleet-stat s-avail">
+                    <div class="stat-label">Available</div>
+                    <div class="stat-num">@Model.TotalAvailable</div>
+                    <div class="stat-sub">Ready to assign</div>
+                </div>
+                <div class="fleet-stat s-inuse">
+                    <div class="stat-label">In Use</div>
+                    <div class="stat-num">@Model.TotalInUse</div>
+                    <div class="stat-sub">Currently deployed</div>
+                </div>
+                <div class="fleet-stat s-maint">
+                    <div class="stat-label">Maintenance</div>
+                    <div class="stat-num">@Model.TotalMaintenance</div>
+                    <div class="stat-sub">Under service</div>
+                </div>
+            </div>
+
+            <!-- ── Filter bar ── -->
+            <div class="fleet-filter-bar">
+                <input class="fleet-search" type="text" id="fleetSearch"
+                       placeholder="&#128269;  Search by vehicle name or registration…" />
+                <button class="fleet-filter-btn active" onclick="filterStatus('all', this)">All</button>
+                <button class="fleet-filter-btn" onclick="filterStatus('available', this)">Available</button>
+                <button class="fleet-filter-btn" onclick="filterStatus('in use', this)">In Use</button>
+                <button class="fleet-filter-btn" onclick="filterStatus('maintenance', this)">Maintenance</button>
+            </div>
+
+            @if (!Model.VehicleGroups.Any())
+            {
+                <div class="fleet-empty">
+                    <div class="empty-icon">🚘</div>
+                    <p>No active vehicles found in the fleet.</p>
+                </div>
+            }
+            else
+            {
+                foreach (var group in Model.VehicleGroups)
+                {
+                    int pct = group.TotalCount > 0
+                    ? (int)Math.Round((double)group.AvailableCount / group.TotalCount * 100)
+                    : 0;
+
+                    <div class="vehicle-group" id="group-@group.VehicleType.Replace(" ", "_")">
+                        <!-- Group header (click to collapse) -->
+                        <div class="group-header"
+                             onclick="toggleGroup(this.closest('.vehicle-group'))">
+                            <div class="group-icon">🚗</div>
+                            <div class="group-title">@group.VehicleType</div>
+                            <div class="group-pills">
+                                <span class="gpill gpill-total">@group.TotalCount Total</span>
+                                @if (group.AvailableCount > 0)
+                                {
+                                    <span class="gpill gpill-avail">@group.AvailableCount Available</span>
+                                }
+                                @if (group.InUseCount > 0)
+                                {
+                                    <span class="gpill gpill-inuse">@group.InUseCount In Use</span>
+                                }
+                                @if (group.MaintenanceCount > 0)
+                                {
+                                    <span class="gpill gpill-maint">@group.MaintenanceCount Maintenance</span>
+                                }
+                            </div>
+                            <!-- Availability mini-bar -->
+                            <div class="avail-bar-wrap" style="min-width:100px; margin-left:8px;">
+                                <div class="avail-bar">
+                                    <div class="avail-bar-fill" style="width:@pct%"></div>
+                                </div>
+                                <span class="avail-pct">@pct%</span>
+                            </div>
+                            <span class="group-chevron">&#9660;</span>
+                        </div>
+
+                        <!-- Group body: vehicle table -->
+                        <div class="group-body vehicle-table-wrap">
+                            <table class="vehicle-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Vehicle Name</th>
+                                        <th>Registration No.</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int rowNo = 1;
+                                    }
+                                    @foreach (var v in group.Vehicles)
+                                    {
+                                        string statusClass = v.Status?.ToLower() switch
+                                        {
+                                            "available" => "sb-available",
+                                            "in use" => "sb-inuse",
+                                            "under maintenance" => "sb-maintenance",
+                                            _ => "sb-other"
+                                        };
+
+                                        <tr class="vehicle-row"
+                                            data-name="@v.VehicleName.ToLower()"
+                                            data-reg="@v.RegistrationNumber.ToLower()"
+                                            data-status="@v.Status?.ToLower()">
+                                            <td style="color:#b4b2a9; font-size:12px;">@rowNo</td>
+                                            <td><span class="veh-name">@v.VehicleName</span></td>
+                                            <td><span class="veh-reg">@v.RegistrationNumber</span></td>
+                                            <td>@v.Year</td>
+                                            <td>
+                                                <span class="status-badge @statusClass">
+                                                    @v.Status
+                                                </span>
+                                            </td>
+                                            <td style="color:#888780; font-size:12px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                @(string.IsNullOrEmpty(v.Notes) ? "—" : v.Notes)
+                                            </td>
+                                        </tr>
+                                        rowNo++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            }
+
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        /* ── Collapse / Expand group ── */
+        function toggleGroup(card) {
+            card.classList.toggle('collapsed');
+        }
+
+        /* ── Status filter ── */
+        let activeStatus = 'all';
+        function filterStatus(status, btn) {
+            activeStatus = status;
+            document.querySelectorAll('.fleet-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        /* ── Search ── */
+        document.getElementById('fleetSearch').addEventListener('input', applyFilters);
+
+        function applyFilters() {
+            const q = document.getElementById('fleetSearch').value.toLowerCase().trim();
+
+            document.querySelectorAll('.vehicle-row').forEach(row => {
+                const nameMatch   = row.dataset.name.includes(q);
+                const regMatch    = row.dataset.reg.includes(q);
+                const statusMatch = activeStatus === 'all' || row.dataset.status.includes(activeStatus);
+                row.style.display = (nameMatch || regMatch) && statusMatch ? '' : 'none';
+            });
+
+            /* Hide group cards that have zero visible rows */
+            document.querySelectorAll('.vehicle-group').forEach(group => {
+                const visibleRows = group.querySelectorAll('.vehicle-row:not([style*="display: none"])');
+                group.style.display = visibleRows.length > 0 ? '' : 'none';
+            });
+        }
+    </script>
+}

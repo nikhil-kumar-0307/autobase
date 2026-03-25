@@ -47,7 +47,7 @@ namespace autobase.Controllers
                 Name = model.Name,
                 EmployeeNumber = model.EmployeeNumber,
                 MobileNumber = model.MobileNumber,
-                Password = HashPassword(model.Password),  // ✅ Never store plain text
+                Password = HashPassword(model.Password),
                 Role = model.Role
             };
 

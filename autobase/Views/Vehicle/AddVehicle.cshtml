@@ -4,132 +4,260 @@
     Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
 }
 <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
 <style>
-    /* ── Reset & Base ─────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    .av-wrapper {
-        --ink: #0d0f14;
-        --ink2: #1c1f2b;
-        --surface: #ffffff;
-        --surface2: #f5f6fa;
-        --border: #e4e6ef;
-        --muted: #8891ab;
-        --gold: #f5c518;
-        --gold-dark: #c49d0d;
-        --gold-glow: rgba(245,197,24,0.18);
-        --danger: #e8405a;
-        --success: #22c55e;
-        --radius: 16px;
-        --radius-sm: 10px;
-        font-family: 'DM Sans', sans-serif;
+    /* ════════════════════════════════════════════════════
+       ROOT TOKENS
+    ════════════════════════════════════════════════════ */
+    .fv {
+        --red: #d62839;
+        --red-dk: #b01e2d;
+        --red-lt: rgba(214,40,57,0.08);
+        --red-glow: rgba(214,40,57,0.18);
+        --blue: #1a3a6b;
+        --blue-md: #2251a3;
+        --blue-lt: rgba(26,58,107,0.07);
+        --blue-glow: rgba(34,81,163,0.18);
+        --white: #ffffff;
+        --off: #f7f8fc;
+        --off2: #eef0f7;
+        --border: #dde2f0;
+        --border2: #c8cfe6;
+        --ink: #0d1329;
+        --ink2: #2c3454;
+        --muted: #7580a0;
+        --muted2: #a8b0cc;
+        --success: #17a34a;
+        --warn: #d97706;
+        --r: 14px;
+        --r-sm: 9px;
+        font-family: 'Nunito', sans-serif;
+        color: var(--ink);
     }
 
-    /* ── Page Header ──────────────────────────────── */
-    .av-page-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 32px;
-        gap: 16px;
-    }
-
-    .av-page-eyebrow {
-        font-family: 'Syne', sans-serif;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--gold-dark);
-        margin-bottom: 6px;
+    /* ════════════════════════════════════════════════════
+       BREADCRUMB
+    ════════════════════════════════════════════════════ */
+    .fv-crumb {
         display: flex;
         align-items: center;
         gap: 6px;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-bottom: 24px;
     }
 
-    .av-page-eyebrow::before {
-        content: '';
-        display: inline-block;
-        width: 20px;
-        height: 2px;
-        background: var(--gold);
-        border-radius: 99px;
+        .fv-crumb a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .15s;
+        }
+
+            .fv-crumb a:hover {
+                color: var(--blue-md);
+            }
+
+        .fv-crumb .sep {
+            color: var(--muted2);
+        }
+
+        .fv-crumb .cur {
+            color: var(--ink2);
+            font-weight: 700;
+        }
+
+    /* ════════════════════════════════════════════════════
+       PAGE HERO
+    ════════════════════════════════════════════════════ */
+    .fv-hero {
+        display: flex;
+        align-items: stretch;
+        border-radius: var(--r);
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(26,58,107,0.13);
+        margin-bottom: 28px;
+        animation: heroIn .5s cubic-bezier(.22,1,.36,1) both;
     }
 
-    .av-page-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--ink);
+    @@keyframes heroIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fv-hero-stripe {
+        width: 8px;
+        background: linear-gradient(180deg, var(--red) 0%, var(--red-dk) 100%);
+        flex-shrink: 0;
+    }
+
+    .fv-hero-body {
+        flex: 1;
+        background: linear-gradient(110deg, var(--blue) 0%, var(--blue-md) 100%);
+        padding: 24px 28px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .fv-hero-body::before,
+        .fv-hero-body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.07);
+        }
+
+        .fv-hero-body::before {
+            width: 200px;
+            height: 200px;
+            right: -60px;
+            top: -80px;
+        }
+
+        .fv-hero-body::after {
+            width: 120px;
+            height: 120px;
+            right: 80px;
+            bottom: -50px;
+        }
+
+    .fv-hero-icon-wrap {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.12);
+        border: 1.5px solid rgba(255,255,255,0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+        .fv-hero-icon-wrap svg {
+            width: 26px;
+            height: 26px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .fv-hero-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    .fv-hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 5px;
+    }
+
+    .fv-hero-tag-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--red);
+    }
+
+    .fv-hero-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
         line-height: 1.1;
-        letter-spacing: -0.02em;
+        color: #fff;
+        letter-spacing: .01em;
     }
 
-    .av-page-title span {
-        color: var(--gold-dark);
-    }
+        .fv-hero-title span {
+            color: #ff8a95;
+        }
 
-    .av-page-sub {
-        font-size: 14px;
-        color: var(--muted);
-        margin-top: 6px;
-    }
-
-    /* ── Breadcrumb ───────────────────────────────── */
-    .av-breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .fv-hero-sub {
         font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 28px;
+        color: rgba(255,255,255,0.5);
+        margin-top: 5px;
     }
 
-    .av-breadcrumb a {
-        color: var(--muted);
-        text-decoration: none;
-        transition: color 0.15s;
+    .fv-hero-badge {
+        margin-left: auto;
+        position: relative;
+        z-index: 1;
+        background: var(--red);
+        border-radius: 8px;
+        padding: 6px 16px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(214,40,57,0.45);
+        white-space: nowrap;
     }
 
-    .av-breadcrumb a:hover { color: var(--gold-dark); }
-    .av-breadcrumb .sep { opacity: 0.4; }
-    .av-breadcrumb .current { color: var(--ink); font-weight: 500; }
-
-    /* ── Alert/Info Banner ────────────────────────── */
-    .av-banner {
+    /* ════════════════════════════════════════════════════
+       BANNERS
+    ════════════════════════════════════════════════════ */
+    .fv-banner {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 14px 20px;
-        border-radius: var(--radius-sm);
+        gap: 13px;
+        padding: 13px 18px;
+        border-radius: var(--r-sm);
         font-size: 13.5px;
-        margin-bottom: 28px;
-        border: 1.5px solid;
-        animation: bannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        margin-bottom: 22px;
+        border-left: 4px solid;
+        animation: bannerSlide .4s ease both;
     }
 
-    @@keyframes bannerIn {
-        from { opacity: 0; transform: translateY(-8px); }
-        to   { opacity: 1; transform: translateY(0); }
+    @@keyframes bannerSlide {
+        from {
+            opacity: 0;
+            transform: translateX(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
-    .av-banner.info {
-        background: linear-gradient(135deg, rgba(245,197,24,0.06), rgba(245,197,24,0.02));
-        border-color: rgba(245,197,24,0.35);
-        color: #7a6000;
+    .fv-banner.info {
+        background: #edf2fb;
+        border-color: var(--blue-md);
+        color: var(--blue);
     }
 
-    .av-banner.success {
-        background: linear-gradient(135deg, rgba(34,197,94,0.07), rgba(34,197,94,0.02));
-        border-color: rgba(34,197,94,0.35);
-        color: #166534;
+    .fv-banner.ok {
+        background: #edfaf3;
+        border-color: var(--success);
+        color: #14532d;
     }
 
-    .av-banner-icon {
-        width: 36px;
-        height: 36px;
+    .fv-banner-ico {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -137,613 +265,1019 @@
         flex-shrink: 0;
     }
 
-    .av-banner.info .av-banner-icon { background: rgba(245,197,24,0.15); }
-    .av-banner.success .av-banner-icon { background: rgba(34,197,94,0.15); }
+    .fv-banner.info .fv-banner-ico {
+        background: rgba(34,81,163,0.12);
+    }
 
-    .av-banner-icon svg {
-        width: 18px;
-        height: 18px;
-        stroke-width: 2;
+    .fv-banner.ok .fv-banner-ico {
+        background: rgba(23,163,74,0.14);
+    }
+
+    .fv-banner-ico svg {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke-width: 2.3;
         stroke-linecap: round;
         stroke-linejoin: round;
-        fill: none;
     }
 
-    .av-banner.info .av-banner-icon svg { stroke: var(--gold-dark); }
-    .av-banner.success .av-banner-icon svg { stroke: var(--success); }
+    .fv-banner.info .fv-banner-ico svg {
+        stroke: var(--blue-md);
+    }
 
-    /* ── Card ─────────────────────────────────────── */
-    .av-card {
-        background: var(--surface);
+    .fv-banner.ok .fv-banner-ico svg {
+        stroke: var(--success);
+    }
+
+    /* ════════════════════════════════════════════════════
+       LAYOUT
+    ════════════════════════════════════════════════════ */
+    .fv-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* ════════════════════════════════════════════════════
+       CARD
+    ════════════════════════════════════════════════════ */
+    .fv-card {
+        background: var(--white);
         border: 1.5px solid var(--border);
-        border-radius: var(--radius);
+        border-radius: var(--r);
+        box-shadow: 0 2px 16px rgba(26,58,107,0.07);
         overflow: hidden;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+        animation: cardUp .5s cubic-bezier(.22,1,.36,1) .08s both;
     }
 
-    @@keyframes cardIn {
-        from { opacity: 0; transform: translateY(16px); }
-        to   { opacity: 1; transform: translateY(0); }
+    @@keyframes cardUp {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    /* ── Card Header Strip ────────────────────────── */
-    .av-card-header {
-        background: var(--ink);
-        padding: 22px 32px;
+    .fv-card-accent {
+        height: 4px;
+        background: linear-gradient(90deg, var(--red) 0%, var(--blue-md) 100%);
+    }
+
+    .fv-card-head {
+        padding: 18px 26px;
+        border-bottom: 1.5px solid var(--border);
         display: flex;
         align-items: center;
-        gap: 14px;
-        position: relative;
-        overflow: hidden;
+        gap: 12px;
+        background: var(--off);
     }
 
-    .av-card-header::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 10px,
-            rgba(255,255,255,0.015) 10px,
-            rgba(255,255,255,0.015) 20px
-        );
-    }
-
-    .av-card-header-icon {
-        width: 44px;
-        height: 44px;
-        background: var(--gold);
-        border-radius: 12px;
+    .fv-card-head-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        background: var(--blue-lt);
+        border: 1.5px solid rgba(34,81,163,0.18);
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
-        position: relative;
-        box-shadow: 0 0 0 6px rgba(245,197,24,0.15);
     }
 
-    .av-card-header-icon svg {
-        width: 22px;
-        height: 22px;
-        stroke: #0d0f14;
-        fill: none;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .fv-card-head-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--blue-md);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .av-card-header-text { position: relative; }
-
-    .av-card-header-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 16px;
+    .fv-card-head-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 15px;
         font-weight: 700;
-        color: #fff;
-        letter-spacing: -0.01em;
+        color: var(--ink2);
+        letter-spacing: .01em;
     }
 
-    .av-card-header-sub {
-        font-size: 12.5px;
-        color: rgba(255,255,255,0.45);
-        margin-top: 2px;
-    }
-
-    .av-card-header-badge {
-        margin-left: auto;
-        background: rgba(245,197,24,0.12);
-        border: 1px solid rgba(245,197,24,0.25);
-        border-radius: 99px;
-        padding: 4px 12px;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--gold);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        position: relative;
-    }
-
-    /* ── Card Body ────────────────────────────────── */
-    .av-card-body {
-        padding: 36px 32px;
-    }
-
-    /* ── Section Labels ───────────────────────────── */
-    .av-section-label {
-        font-family: 'Syne', sans-serif;
-        font-size: 10.5px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+    .fv-card-head-sub {
+        font-size: 12px;
         color: var(--muted);
-        margin-bottom: 18px;
+        margin-top: 1px;
+    }
+
+    .fv-card-head-count {
+        margin-left: auto;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--blue-md);
+        background: var(--blue-lt);
+        border: 1px solid rgba(34,81,163,0.18);
+        border-radius: 6px;
+        padding: 3px 10px;
+    }
+
+    .fv-card-body {
+        padding: 28px 26px;
+    }
+
+    /* ════════════════════════════════════════════════════
+       SECTION HEADER
+    ════════════════════════════════════════════════════ */
+    .fv-sec-hd {
         display: flex;
         align-items: center;
         gap: 10px;
+        margin-bottom: 20px;
     }
 
-    .av-section-label::after {
-        content: '';
+    .fv-sec-pip {
+        width: 4px;
+        height: 20px;
+        border-radius: 99px;
+        flex-shrink: 0;
+        background: linear-gradient(180deg, var(--red), var(--blue-md));
+    }
+
+    .fv-sec-label {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--ink2);
+    }
+
+    .fv-sec-line {
         flex: 1;
         height: 1px;
         background: var(--border);
     }
 
-    /* ── Form Grid ────────────────────────────────── */
-    .av-form-grid {
+    /* ════════════════════════════════════════════════════
+       FORM GRID & GROUP
+    ════════════════════════════════════════════════════ */
+    .fv-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 22px;
+        gap: 18px;
     }
 
-    .av-form-grid .full-width { grid-column: 1 / -1; }
+        .fv-grid .fw {
+            grid-column: 1 / -1;
+        }
 
-    /* ── Form Group ───────────────────────────────── */
-    .av-form-group {
+    .fv-fg {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
     }
 
-    .av-label {
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
+    .fv-lbl {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .1em;
         text-transform: uppercase;
         color: var(--ink2);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .fv-lbl .req {
+            color: var(--red);
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .fv-lbl .opt {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--muted2);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+    .fv-err {
+        font-size: 12px;
+        color: var(--red);
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .av-label .req {
-        color: var(--danger);
-        font-size: 14px;
-        line-height: 1;
-    }
-
-    .av-label .hint {
-        margin-left: auto;
-        font-size: 11px;
-        font-weight: 400;
-        color: var(--muted);
-        text-transform: none;
-        letter-spacing: 0;
-    }
-
-    /* ── Input Field ──────────────────────────────── */
-    .av-field {
+    /* ════════════════════════════════════════════════════
+       INPUT SHELL
+    ════════════════════════════════════════════════════ */
+    .fv-input-shell {
         position: relative;
+        display: flex;
+        align-items: center;
     }
 
-    .av-field-icon {
+    .fv-shell-icon {
         position: absolute;
-        left: 14px;
+        left: 13px;
         top: 50%;
         transform: translateY(-50%);
         width: 16px;
         height: 16px;
-        stroke: var(--muted);
+        stroke: var(--muted2);
         fill: none;
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
         pointer-events: none;
-        transition: stroke 0.15s;
+        transition: stroke .15s;
+        z-index: 1;
     }
 
-    .av-input {
-        width: 100%;
-        height: 48px;
-        padding: 0 16px 0 42px;
-        background: var(--surface2);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius-sm);
-        font-family: 'DM Sans', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        color: var(--ink);
-        outline: none;
-        transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    .fv-input-shell:focus-within .fv-shell-icon {
+        stroke: var(--blue-md);
     }
 
-    .av-input::placeholder { color: var(--muted); font-size: 13.5px; }
-
-    .av-input:focus {
-        border-color: var(--gold);
-        background: #fff;
-        box-shadow: 0 0 0 4px var(--gold-glow);
-    }
-
-    .av-input:focus ~ .av-field-icon { stroke: var(--gold-dark); }
-
-    /* Fix: icon is before input in DOM so use parent hover trick */
-    .av-field:focus-within .av-field-icon { stroke: var(--gold-dark); }
-
-    .av-input.no-icon { padding-left: 16px; }
-
-    /* ── Select ───────────────────────────────────── */
-    select.av-input {
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238891ab' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 16px center;
-        padding-right: 40px;
-    }
-
-    /* Status colored dots inside select */
-    .av-status-wrap { position: relative; }
-
-    .av-status-dot {
+    .fv-shell-chevron {
         position: absolute;
-        left: 14px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
+        width: 14px;
+        height: 14px;
         pointer-events: none;
-        transition: background 0.2s;
+        stroke: var(--muted2);
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke .15s;
     }
 
-    /* ── Textarea ─────────────────────────────────── */
-    textarea.av-input {
+    .fv-input-shell:focus-within .fv-shell-chevron {
+        stroke: var(--blue-md);
+    }
+
+    .fv-ctrl {
+        width: 100%;
+        height: 46px;
+        padding: 0 14px 0 40px;
+        background: var(--off);
+        border: 1.5px solid var(--border2);
+        border-radius: var(--r-sm);
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        outline: none;
+        transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+        .fv-ctrl::placeholder {
+            color: var(--muted2);
+            font-size: 13px;
+        }
+
+        .fv-ctrl:focus {
+            border-color: var(--blue-md);
+            background: var(--white);
+            box-shadow: 0 0 0 3px var(--blue-glow);
+        }
+
+    select.fv-ctrl {
+        appearance: none;
+        cursor: pointer;
+    }
+
+    textarea.fv-ctrl {
         height: auto;
-        padding: 14px 16px;
+        padding: 12px 14px;
         resize: vertical;
         line-height: 1.6;
     }
 
-    /* ── Field Error ──────────────────────────────── */
-    .av-field-error {
-        font-size: 12px;
-        color: var(--danger);
-        display: flex;
-        align-items: center;
-        gap: 4px;
+    .fv-ctrl.bare {
+        padding-left: 14px;
     }
 
-    /* ── Divider ──────────────────────────────────── */
-    .av-divider {
+    .fv-status-dot {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 2;
+        transition: background .2s;
+    }
+
+    /* ════════════════════════════════════════════════════
+       DIVIDER
+    ════════════════════════════════════════════════════ */
+    .fv-div {
         height: 1px;
         background: var(--border);
-        margin: 32px 0;
+        margin: 26px 0;
     }
 
-    /* ── Form Actions ─────────────────────────────── */
-    .av-actions {
+    /* ════════════════════════════════════════════════════
+       ACTIONS
+    ════════════════════════════════════════════════════ */
+    .fv-actions {
         display: flex;
         align-items: center;
         gap: 12px;
         flex-wrap: wrap;
     }
 
-    .av-btn-save {
-        height: 50px;
-        padding: 0 32px;
-        background: var(--gold);
-        border: 2px solid var(--gold);
-        border-radius: var(--radius-sm);
-        font-family: 'Syne', sans-serif;
-        font-size: 14px;
+    .fv-btn-save {
+        height: 48px;
+        padding: 0 28px;
+        background: linear-gradient(135deg, var(--red) 0%, var(--red-dk) 100%);
+        border: none;
+        border-radius: var(--r-sm);
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 15px;
         font-weight: 700;
-        letter-spacing: 0.04em;
-        color: var(--ink);
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: #fff;
         cursor: pointer;
-        transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s, box-shadow 0.18s;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
+        transition: all .18s;
+        box-shadow: 0 4px 14px rgba(214,40,57,0.3);
         position: relative;
         overflow: hidden;
     }
 
-    .av-btn-save::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.18));
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
+        .fv-btn-save::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.15));
+            opacity: 0;
+            transition: opacity .2s;
+        }
 
-    .av-btn-save:hover {
-        background: var(--gold-dark);
-        border-color: var(--gold-dark);
-        color: #fff;
-        box-shadow: 0 6px 20px rgba(245,197,24,0.35);
-        transform: translateY(-1px);
-    }
+        .fv-btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(214,40,57,0.4);
+        }
 
-    .av-btn-save:hover::before { opacity: 1; }
+            .fv-btn-save:hover::after {
+                opacity: 1;
+            }
 
-    .av-btn-save:active { transform: translateY(0) scale(0.98); }
+        .fv-btn-save:active {
+            transform: scale(.97);
+        }
 
-    .av-btn-save svg {
-        width: 17px;
-        height: 17px;
-        stroke: currentColor;
-        fill: none;
-        stroke-width: 2.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .fv-btn-save svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .av-btn-cancel {
-        height: 50px;
-        padding: 0 24px;
-        background: transparent;
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius-sm);
-        font-family: 'DM Sans', sans-serif;
+    .fv-btn-cancel {
+        height: 48px;
+        padding: 0 22px;
+        background: var(--white);
+        border: 1.5px solid var(--border2);
+        border-radius: var(--r-sm);
+        font-family: 'Nunito', sans-serif;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--muted);
-        cursor: pointer;
         text-decoration: none;
+        cursor: pointer;
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.15s;
+        transition: all .15s;
     }
 
-    .av-btn-cancel:hover {
-        border-color: #bbb;
-        color: var(--ink);
-        background: var(--surface2);
-    }
+        .fv-btn-cancel:hover {
+            border-color: var(--blue-md);
+            color: var(--blue);
+            background: var(--blue-lt);
+        }
 
-    .av-btn-cancel svg {
-        width: 15px;
-        height: 15px;
-        stroke: currentColor;
-        fill: none;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .fv-btn-cancel svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .av-actions-hint {
+    .fv-actions-note {
         margin-left: auto;
-        font-size: 12.5px;
-        color: var(--muted);
+        font-size: 12px;
+        color: var(--muted2);
     }
 
-    /* ── Input states ─────────────────────────────── */
-    .av-input.input-error { border-color: var(--danger); }
-
-    /* ── Validation summary ───────────────────────── */
-    .av-validation-summary {
-        background: #fff5f7;
-        border: 1.5px solid rgba(232,64,90,0.3);
-        border-radius: var(--radius-sm);
-        padding: 14px 18px;
+    .fv-val-sum {
+        background: #fff5f6;
+        border: 1.5px solid rgba(214,40,57,.25);
+        border-left: 4px solid var(--red);
+        border-radius: var(--r-sm);
+        padding: 13px 16px;
         font-size: 13px;
-        color: var(--danger);
-        margin-bottom: 24px;
+        color: var(--red);
+        margin-bottom: 20px;
     }
 
-    /* ── Responsive ───────────────────────────────── */
-    @@media (max-width: 680px) {
-        .av-form-grid { grid-template-columns: 1fr; }
-        .av-form-grid .full-width { grid-column: 1; }
-        .av-card-body { padding: 24px 20px; }
-        .av-card-header { padding: 18px 20px; }
-        .av-page-title { font-size: 24px; }
-        .av-actions { flex-direction: column; align-items: stretch; }
-        .av-btn-save, .av-btn-cancel { justify-content: center; }
-        .av-actions-hint { display: none; }
+    /* ════════════════════════════════════════════════════
+       SIDE PANEL
+    ════════════════════════════════════════════════════ */
+    .fv-side {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .fv-stat-card {
+        background: var(--white);
+        border: 1.5px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(26,58,107,0.07);
+        animation: cardUp .5s cubic-bezier(.22,1,.36,1) .15s both;
+    }
+
+    .fv-stat-card-accent {
+        height: 4px;
+        background: linear-gradient(90deg, var(--blue-md), var(--red));
+    }
+
+    .fv-stat-card-hd {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: var(--off);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .fv-stat-card-hd svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--blue-md);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .fv-stat-card-hd span {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--ink2);
+        }
+
+    .fv-stat-card-body {
+        padding: 18px;
+    }
+
+    .fv-status-list {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+    }
+
+    .fv-status-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 13px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: var(--off);
+        transition: all .15s;
+        cursor: default;
+    }
+
+        .fv-status-item:hover {
+            border-color: var(--border2);
+            background: var(--off2);
+        }
+
+        .fv-status-item.active-status {
+            border-color: rgba(34,81,163,0.25);
+            background: var(--blue-lt);
+        }
+
+    .fv-si-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .fv-si-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink2);
+    }
+
+    .fv-si-desc {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 1px;
+    }
+
+    .fv-steps-card {
+        background: linear-gradient(145deg, var(--blue) 0%, var(--blue-md) 100%);
+        border-radius: var(--r);
+        padding: 20px;
+        box-shadow: 0 6px 22px rgba(26,58,107,0.22);
+        animation: cardUp .5s cubic-bezier(.22,1,.36,1) .22s both;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .fv-steps-card::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,.07);
+            bottom: -50px;
+            right: -30px;
+        }
+
+    .fv-steps-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.6);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .fv-steps-title::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 2px;
+            background: var(--red);
+            border-radius: 99px;
+        }
+
+    .fv-step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+    }
+
+        .fv-step:last-child {
+            margin-bottom: 0;
+        }
+
+    .fv-step-num {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        flex-shrink: 0;
+        background: var(--red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(214,40,57,0.4);
+        margin-top: 1px;
+    }
+
+    .fv-step-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .fv-step-desc {
+        font-size: 12px;
+        color: rgba(255,255,255,.5);
+        margin-top: 2px;
+        line-height: 1.5;
+    }
+
+    /* ════════════════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════════════════ */
+    @@media (max-width: 960px) {
+        .fv-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .fv-side {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .fv-stat-card, .fv-steps-card {
+            flex: 1;
+            min-width: 240px;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .fv-grid {
+            grid-template-columns: 1fr;
+        }
+
+            .fv-grid .fw {
+                grid-column: 1;
+            }
+
+        .fv-card-body {
+            padding: 20px 16px;
+        }
+
+        .fv-card-head {
+            padding: 14px 16px;
+        }
+
+        .fv-hero-badge {
+            display: none;
+        }
+
+        .fv-hero-body {
+            padding: 18px 20px;
+        }
+
+        .fv-hero-title {
+            font-size: 22px;
+        }
+
+        .fv-actions {
+            flex-direction: column;
+        }
+
+        .fv-btn-save, .fv-btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .fv-actions-note {
+            display: none;
+        }
     }
 </style>
 
-<div class="ab-shell av-wrapper">
+<div class="ab-shell fv">
     @await Html.PartialAsync("_AdminSidebar")
     <div class="ab-main">
         @await Html.PartialAsync("_AdminTopbar")
         <div class="ab-content">
 
             <!-- Breadcrumb -->
-            <div class="av-breadcrumb">
+            <nav class="fv-crumb">
                 <a href="#">Dashboard</a>
                 <span class="sep">›</span>
                 <a href="#">Fleet</a>
                 <span class="sep">›</span>
-                <span class="current">Add Vehicle</span>
-            </div>
+                <span class="cur">Add Vehicle</span>
+            </nav>
 
-            <!-- Page Header -->
-            <div class="av-page-header">
-                <div>
-                    <div class="av-page-eyebrow">Fleet Management</div>
-                    <div class="av-page-title">Add New <span>Vehicle</span></div>
-                    <div class="av-page-sub">Register a new vehicle into the Autobase fleet inventory.</div>
+            <!-- Hero -->
+            <div class="fv-hero">
+                <div class="fv-hero-stripe"></div>
+                <div class="fv-hero-body">
+                    <div class="fv-hero-icon-wrap">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="1" y="3" width="15" height="13" rx="2" />
+                            <path d="M16 8h4l3 5v3h-7V8z" />
+                            <circle cx="5.5" cy="18.5" r="2.5" />
+                            <circle cx="18.5" cy="18.5" r="2.5" />
+                        </svg>
+                    </div>
+                    <div class="fv-hero-text">
+                        <div class="fv-hero-tag">
+                            <span class="fv-hero-tag-dot"></span>
+                            Fleet Management
+                        </div>
+                        <div class="fv-hero-title">Register <span>New Vehicle</span></div>
+                        <div class="fv-hero-sub">Add a new unit to the Autobase fleet inventory</div>
+                    </div>
+                    <div class="fv-hero-badge">New Entry</div>
                 </div>
             </div>
 
             <!-- Success Banner -->
             @if (TempData["Success"] != null)
             {
-                <div class="av-banner success">
-                    <div class="av-banner-icon">
-                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <div class="fv-banner ok">
+                    <div class="fv-banner-ico">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
-                    <div>
-                        <strong>Vehicle added successfully!</strong><br>
-                        <span style="opacity:0.8">@TempData["Success"]</span>
-                    </div>
+                    <div><strong>Success!</strong> &nbsp;@TempData["Success"]</div>
                 </div>
             }
 
             <!-- Info Banner -->
-            <div class="av-banner info">
-                <div class="av-banner-icon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div class="fv-banner info">
+                <div class="fv-banner-ico">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                 </div>
-                <span>Fields marked <strong>*</strong> are required. Ensure the registration number is unique across the fleet.</span>
+                <span>Fields marked <strong>*</strong> are required. Vehicle Name &amp; Type are sourced from your registered vehicle catalogue.</span>
             </div>
 
-            <!-- Main Form Card -->
-            <div class="av-card">
+            <!-- Two-column layout -->
+            <div class="fv-layout">
 
-                <!-- Card Header -->
-                <div class="av-card-header">
-                    <div class="av-card-header-icon">
-                        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <!-- ══ MAIN FORM CARD ══ -->
+                <div class="fv-card">
+                    <div class="fv-card-accent"></div>
+                    <div class="fv-card-head">
+                        <div class="fv-card-head-icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="1" y="3" width="15" height="13" rx="2" />
+                                <path d="M16 8h4l3 5v3h-7V8z" />
+                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                <circle cx="18.5" cy="18.5" r="2.5" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="fv-card-head-title">Vehicle Details</div>
+                            <div class="fv-card-head-sub">Fill in all fields to complete registration</div>
+                        </div>
+                        <div class="fv-card-head-count">Form</div>
                     </div>
-                    <div class="av-card-header-text">
-                        <div class="av-card-header-title">Vehicle Information</div>
-                        <div class="av-card-header-sub">Fill in all details for the new fleet entry</div>
+
+                    <div class="fv-card-body">
+                        <form asp-controller="Vehicle" asp-action="AddVehicle" method="post">
+
+                            @if (ViewData.ModelState.ErrorCount > 0)
+                            {
+                                <div class="fv-val-sum">
+                                    <div asp-validation-summary="All"></div>
+                                </div>
+                            }
+
+                            <!-- ── Basic Info ── -->
+                            <div class="fv-sec-hd">
+                                <div class="fv-sec-pip"></div>
+                                <span class="fv-sec-label">Basic Information</span>
+                                <div class="fv-sec-line"></div>
+                            </div>
+
+                            <div class="fv-grid">
+
+                                <!-- Vehicle Name dropdown -->
+                                <div class="fv-fg">
+                                    <label asp-for="VehicleName" class="fv-lbl">
+                                        Vehicle Name <span class="req">*</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <svg class="fv-shell-icon" viewBox="0 0 24 24">
+                                            <rect x="1" y="3" width="15" height="13" rx="2" />
+                                            <path d="M16 8h4l3 5v3h-7V8z" />
+                                            <circle cx="5.5" cy="18.5" r="2.5" />
+                                            <circle cx="18.5" cy="18.5" r="2.5" />
+                                        </svg>
+                                        <select asp-for="VehicleName" class="fv-ctrl" id="vehicleNameSel"
+                                                onchange="syncType(this)">
+                                            <option value="">— Choose vehicle —</option>
+                                            @if (ViewBag.VehicleTypeList != null)
+                                            {
+                                                var names = ((IEnumerable<autobase.Models.Entities.VehicleType>)ViewBag.VehicleTypeList)
+                                                .Select(v => v.VehicleName).Distinct().OrderBy(n => n);
+                                                foreach (var name in names)
+                                                {
+                                                    <option value="@name">@name</option>
+                                                }
+                                            }
+                                        </select>
+                                        <svg class="fv-shell-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                                    </div>
+                                    <span asp-validation-for="VehicleName" class="fv-err"></span>
+                                </div>
+
+                                <!-- Vehicle Type dropdown (filtered) -->
+                                <div class="fv-fg">
+                                    <label asp-for="VehicleType" class="fv-lbl">
+                                        Vehicle Type <span class="req">*</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <svg class="fv-shell-icon" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                        <select asp-for="VehicleType" class="fv-ctrl" id="vehicleTypeSel">
+                                            <option value="">— Pick name first —</option>
+                                        </select>
+                                        <svg class="fv-shell-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                                    </div>
+                                    <span asp-validation-for="VehicleType" class="fv-err"></span>
+                                </div>
+
+                                <!-- Registration Number -->
+                                <div class="fv-fg">
+                                    <label asp-for="RegistrationNumber" class="fv-lbl">
+                                        Registration No. <span class="req">*</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <svg class="fv-shell-icon" viewBox="0 0 24 24">
+                                            <rect x="2" y="5" width="20" height="14" rx="2" />
+                                            <line x1="2" y1="10" x2="22" y2="10" />
+                                        </svg>
+                                        <input asp-for="RegistrationNumber" class="fv-ctrl" placeholder="e.g. MH12AB1234" />
+                                    </div>
+                                    <span asp-validation-for="RegistrationNumber" class="fv-err"></span>
+                                </div>
+
+                                <!-- Year -->
+                                <div class="fv-fg">
+                                    <label asp-for="Year" class="fv-lbl">
+                                        Year of Manufacture <span class="req">*</span>
+                                        <span class="opt">1990–2030</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <svg class="fv-shell-icon" viewBox="0 0 24 24">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                                            <line x1="16" y1="2" x2="16" y2="6" />
+                                            <line x1="8" y1="2" x2="8" y2="6" />
+                                            <line x1="3" y1="10" x2="21" y2="10" />
+                                        </svg>
+                                        <input asp-for="Year" type="number" class="fv-ctrl"
+                                               placeholder="e.g. 2022" min="1990" max="2030" />
+                                    </div>
+                                    <span asp-validation-for="Year" class="fv-err"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="fv-div"></div>
+
+                            <!-- ── Fleet Config ── -->
+                            <div class="fv-sec-hd">
+                                <div class="fv-sec-pip"></div>
+                                <span class="fv-sec-label">Fleet Configuration</span>
+                                <div class="fv-sec-line"></div>
+                            </div>
+
+                            <div class="fv-grid">
+
+                                <!-- Status -->
+                                <div class="fv-fg">
+                                    <label asp-for="Status" class="fv-lbl">
+                                        Status <span class="req">*</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <span class="fv-status-dot" id="statusDot" style="background:#17a34a;"></span>
+                                        <select asp-for="Status" class="fv-ctrl" id="statusSel"
+                                                style="padding-left:30px;"
+                                                onchange="paintDot(this)">
+                                            <option value="Available">Available</option>
+                                            <option value="Allocated">Allocated</option>
+                                            <option value="Maintenance">Maintenance</option>
+                                        </select>
+                                        <svg class="fv-shell-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                                    </div>
+                                    <span asp-validation-for="Status" class="fv-err"></span>
+                                </div>
+
+                                <!-- Notes -->
+                                <div class="fv-fg fw">
+                                    <label asp-for="Notes" class="fv-lbl">
+                                        Notes / Remarks <span class="opt">Optional</span>
+                                    </label>
+                                    <div class="fv-input-shell">
+                                        <textarea asp-for="Notes" class="fv-ctrl bare" rows="3"
+                                                  placeholder="Insurance details, driver notes, service reminders…"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="fv-div"></div>
+
+                            <!-- Actions -->
+                            <div class="fv-actions">
+                                <button type="submit" class="fv-btn-save">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                        <polyline points="17 21 17 13 7 13 7 21" />
+                                        <polyline points="7 3 7 8 15 8" />
+                                    </svg>
+                                    Save Vehicle
+                                </button>
+                                <a asp-controller="Home" asp-action="AdminDashboard" class="fv-btn-cancel">
+                                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                    Cancel
+                                </a>
+                                <span class="fv-actions-note">Saved instantly to the fleet database.</span>
+                            </div>
+
+                        </form>
                     </div>
-                    <div class="av-card-header-badge">New Entry</div>
                 </div>
 
-                <!-- Card Body -->
-                <div class="av-card-body">
+                <!-- ══ SIDE PANEL ══ -->
+                <div class="fv-side">
 
-                    <form asp-controller="Vehicle" asp-action="AddVehicle" method="post">
-
-                        @if (ViewData.ModelState.ErrorCount > 0)
-                        {
-                            <div class="av-validation-summary">
-                                <div asp-validation-summary="All"></div>
-                            </div>
-                        }
-
-                        <!-- Section: Basic Info -->
-                        <div class="av-section-label">Basic Details</div>
-
-                        <div class="av-form-grid">
-
-                            <!-- Vehicle Name -->
-                            <div class="av-form-group">
-                                <label asp-for="VehicleName" class="av-label">
-                                    Vehicle Name <span class="req">*</span>
-                                </label>
-                                <div class="av-field">
-                                    <svg class="av-field-icon" viewBox="0 0 24 24">
-                                        <rect x="1" y="3" width="15" height="13" rx="2"/>
-                                        <path d="M16 8h4l3 5v3h-7V8z"/>
-                                        <circle cx="5.5" cy="18.5" r="2.5"/>
-                                        <circle cx="18.5" cy="18.5" r="2.5"/>
-                                    </svg>
-                                    <input asp-for="VehicleName" class="av-input" placeholder="e.g. Toyota Fortuner" />
-                                </div>
-                                <span asp-validation-for="VehicleName" class="av-field-error"></span>
-                            </div>
-
-                            <!-- Registration Number -->
-                            <div class="av-form-group">
-                                <label asp-for="RegistrationNumber" class="av-label">
-                                    Registration Number <span class="req">*</span>
-                                </label>
-                                <div class="av-field">
-                                    <svg class="av-field-icon" viewBox="0 0 24 24">
-                                        <rect x="2" y="5" width="20" height="14" rx="2"/>
-                                        <line x1="2" y1="10" x2="22" y2="10"/>
-                                    </svg>
-                                    <input asp-for="RegistrationNumber" class="av-input" placeholder="e.g. MH12AB1234" />
-                                </div>
-                                <span asp-validation-for="RegistrationNumber" class="av-field-error"></span>
-                            </div>
-
-                            <!-- Vehicle Type -->
-                            <div class="av-form-group">
-                                <label asp-for="VehicleType" class="av-label">
-                                    Vehicle Type <span class="req">*</span>
-                                </label>
-                                <div class="av-field">
-                                    <svg class="av-field-icon" viewBox="0 0 24 24">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <polyline points="14 2 14 8 20 8"/>
-                                        <line x1="9" y1="15" x2="15" y2="15"/>
-                                    </svg>
-                                    <input asp-for="VehicleType" class="av-input" placeholder="e.g. SUV, Bus, Mini Truck, Van..." />
-                                </div>
-                                <span asp-validation-for="VehicleType" class="av-field-error"></span>
-                            </div>
-
-                            <!-- Year -->
-                            <div class="av-form-group">
-                                <label asp-for="Year" class="av-label">
-                                    Year of Manufacture <span class="req">*</span>
-                                    <span class="hint">1990 – 2030</span>
-                                </label>
-                                <div class="av-field">
-                                    <svg class="av-field-icon" viewBox="0 0 24 24">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                    </svg>
-                                    <input asp-for="Year" type="number" class="av-input"
-                                           placeholder="e.g. 2022" min="1990" max="2030" />
-                                </div>
-                                <span asp-validation-for="Year" class="av-field-error"></span>
-                            </div>
-
+                    <!-- Status guide -->
+                    <div class="fv-stat-card">
+                        <div class="fv-stat-card-accent"></div>
+                        <div class="fv-stat-card-hd">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                            <span>Status Guide</span>
                         </div>
-
-                        <!-- Divider -->
-                        <div class="av-divider"></div>
-
-                        <!-- Section: Fleet Config -->
-                        <div class="av-section-label">Fleet Configuration</div>
-
-                        <div class="av-form-grid">
-
-                            <!-- Status -->
-                            <div class="av-form-group">
-                                <label asp-for="Status" class="av-label">
-                                    Status <span class="req">*</span>
-                                </label>
-                                <div class="av-field av-status-wrap">
-                                    <span class="av-status-dot" id="statusDot" style="background:#22c55e;"></span>
-                                    <select asp-for="Status" class="av-input" id="statusSelect"
-                                            style="padding-left:30px;"
-                                            onchange="updateStatusDot(this)">
-                                        <option value="Available">Available</option>
-                                        <option value="Allocated">Allocated</option>
-                                        <option value="Maintenance">Maintenance</option>
-                                    </select>
+                        <div class="fv-stat-card-body">
+                            <div class="fv-status-list">
+                                <div class="fv-status-item active-status" id="dotAvail">
+                                    <span class="fv-si-dot" style="background:#17a34a;"></span>
+                                    <div>
+                                        <div class="fv-si-label">Available</div>
+                                        <div class="fv-si-desc">Ready to assign to a trip</div>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="Status" class="av-field-error"></span>
-                            </div>
-
-                            <!-- Notes -->
-                            <div class="av-form-group full-width">
-                                <label asp-for="Notes" class="av-label">
-                                    Notes / Remarks
-                                    <span class="hint">Optional</span>
-                                </label>
-                                <div class="av-field">
-                                    <textarea asp-for="Notes" class="av-input no-icon" rows="3"
-                                              placeholder="Any additional information about this vehicle…"></textarea>
+                                <div class="fv-status-item" id="dotAlloc">
+                                    <span class="fv-si-dot" style="background:#d97706;"></span>
+                                    <div>
+                                        <div class="fv-si-label">Allocated</div>
+                                        <div class="fv-si-desc">Currently on an active trip</div>
+                                    </div>
+                                </div>
+                                <div class="fv-status-item" id="dotMaint">
+                                    <span class="fv-si-dot" style="background:#d62839;"></span>
+                                    <div>
+                                        <div class="fv-si-label">Maintenance</div>
+                                        <div class="fv-si-desc">Under repair, not road-ready</div>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
+                    </div>
 
-                        <!-- Divider -->
-                        <div class="av-divider"></div>
-
-                        <!-- Actions -->
-                        <div class="av-actions">
-                            <button type="submit" class="av-btn-save">
-                                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                                Save Vehicle
-                            </button>
-                            <a asp-controller="Home" asp-action="AdminDashboard" class="av-btn-cancel">
-                                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                Cancel
-                            </a>
-                            <span class="av-actions-hint">All changes are saved immediately to the fleet database.</span>
+                    <!-- Steps guide -->
+                    <div class="fv-steps-card">
+                        <div class="fv-steps-title">Quick Guide</div>
+                        <div class="fv-step">
+                            <div class="fv-step-num">1</div>
+                            <div>
+                                <div class="fv-step-title">Pick Vehicle Name</div>
+                                <div class="fv-step-desc">Select from the pre-registered catalogue. Type auto-fills.</div>
+                            </div>
                         </div>
+                        <div class="fv-step">
+                            <div class="fv-step-num">2</div>
+                            <div>
+                                <div class="fv-step-title">Unique Plate Number</div>
+                                <div class="fv-step-desc">Must be unique — duplicates are rejected on submit.</div>
+                            </div>
+                        </div>
+                        <div class="fv-step">
+                            <div class="fv-step-num">3</div>
+                            <div>
+                                <div class="fv-step-title">Set Status</div>
+                                <div class="fv-step-desc">New vehicles are typically Available unless under repair.</div>
+                            </div>
+                        </div>
+                        <div class="fv-step">
+                            <div class="fv-step-num">4</div>
+                            <div>
+                                <div class="fv-step-title">Add Remarks</div>
+                                <div class="fv-step-desc">Optional notes for insurance, history, or instructions.</div>
+                            </div>
+                        </div>
+                    </div>
 
-                    </form>
-                </div>
-            </div>
+                </div><!-- /.fv-side -->
+
+            </div><!-- /.fv-layout -->
 
         </div>
     </div>
@@ -754,28 +1288,57 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        function changeQty(delta) {
-            const input = document.getElementById('qtyInput');
-            let val = parseInt(input.value) || 1;
-            val = Math.max(1, Math.min(999, val + delta));
-            input.value = val;
+        // ── name → types map from server ──────────────────────
+        const typeMap = {};
+        @if (ViewBag.VehicleTypeList != null)
+        {
+                foreach (var vt in (IEnumerable<autobase.Models.Entities.VehicleType>)ViewBag.VehicleTypeList)
+                {
+                        @:if (!typeMap["@Html.Raw(vt.VehicleName.Replace("\"", "\\\""))"]) typeMap["@Html.Raw(vt.VehicleName.Replace("\"", "\\\""))"] = [];
+                        @:typeMap["@Html.Raw(vt.VehicleName.Replace("\"", "\\\""))"].push("@Html.Raw(vt.Type.Replace("\"", "\\\""))");
+                }
         }
 
-        const statusColors = {
-            'Available':   '#22c55e',
-            'Allocated':   '#f59e0b',
-            'Maintenance': '#e8405a'
-        };
+        const preName = "@Html.Raw(Model?.VehicleName ?? "")";
+        const preType = "@Html.Raw(Model?.VehicleType ?? "")";
 
-        function updateStatusDot(sel) {
-            const dot = document.getElementById('statusDot');
-            dot.style.background = statusColors[sel.value] || '#8891ab';
+        function syncType(nameSel) {
+            const typeSel = document.getElementById('vehicleTypeSel');
+            const name = nameSel.value;
+            typeSel.innerHTML = '';
+            if (!name) {
+                typeSel.innerHTML = '<option value="">— Pick name first —</option>';
+                return;
+            }
+            const types = typeMap[name] || [];
+            if (!types.length) {
+                typeSel.innerHTML = '<option value="">No types for this vehicle</option>';
+                return;
+            }
+            typeSel.innerHTML = '<option value="">— Select type —</option>';
+            types.forEach(t => {
+                const o = document.createElement('option');
+                o.value = t; o.textContent = t;
+                if (t === preType) o.selected = true;
+                typeSel.appendChild(o);
+            });
         }
 
-        // init on page load
+        // ── Status dot + guide highlight ──────────────────────
+        const dotColors = { Available:'#17a34a', Allocated:'#d97706', Maintenance:'#d62839' };
+        const guideIds  = { Available:'dotAvail', Allocated:'dotAlloc', Maintenance:'dotMaint' };
+
+        function paintDot(sel) {
+            document.getElementById('statusDot').style.background = dotColors[sel.value] || '#7580a0';
+            Object.values(guideIds).forEach(id => document.getElementById(id).classList.remove('active-status'));
+            if (guideIds[sel.value]) document.getElementById(guideIds[sel.value]).classList.add('active-status');
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            const sel = document.getElementById('statusSelect');
-            if (sel) updateStatusDot(sel);
+            const ss = document.getElementById('statusSel');
+            if (ss) paintDot(ss);
+            const ns = document.getElementById('vehicleNameSel');
+            if (ns && preName) { ns.value = preName; syncType(ns); }
         });
     </script>
 }
