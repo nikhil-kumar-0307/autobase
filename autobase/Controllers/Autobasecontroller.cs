@@ -167,7 +167,7 @@ namespace autobase.Controllers
                     TotalCount = g.Count(),
                     AvailableCount = g.Count(v => v.Status == "Available"),
                     InUseCount = g.Count(v => v.Status == "In Use"),
-                    MaintenanceCount = g.Count(v => v.Status == "Under Maintenance"),
+                    MaintenanceCount = g.Count(v => v.Status == "Maintenance"),
                     Vehicles = g.OrderBy(v => v.VehicleName).ToList()
                 })
                 .OrderBy(g => g.VehicleType)
@@ -179,7 +179,7 @@ namespace autobase.Controllers
                 TotalVehicles = vehicles.Count,
                 TotalAvailable = vehicles.Count(v => v.Status == "Available"),
                 TotalInUse = vehicles.Count(v => v.Status == "In Use"),
-                TotalMaintenance = vehicles.Count(v => v.Status == "Under Maintenance")
+                TotalMaintenance = vehicles.Count(v => v.Status == "Maintenance")
             };
 
             return View(model);
