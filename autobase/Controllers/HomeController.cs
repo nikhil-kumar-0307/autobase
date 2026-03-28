@@ -42,7 +42,22 @@ namespace autobase.Controllers
                     .Where(r => r.EmployeeNumber == HttpContext.Session.GetString("UserEmployeeNumber"))
                     .OrderByDescending(r => r.CreatedAt)
                     .Take(10)
-                    .ToList()
+                    .ToList(),
+
+
+                InUseVehicles = _db.VehicleRequests
+    .Where(r => r.Status == "Approved")
+    .OrderBy(r => r.EndTime)
+    .Select(r => new InUseVehicleInfo
+    {
+        VehicleName = r.VehicleName,
+        RegistrationNumber = r.RegistrationNumber,
+        VehicleType = r.VehicleType,
+        UserName = r.UserName,
+        EmployeeNumber = r.EmployeeNumber,
+        EndTime = r.EndTime
+    })
+    .ToList()
             };
 
             return View(model);

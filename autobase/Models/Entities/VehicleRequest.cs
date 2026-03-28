@@ -15,6 +15,7 @@
         public DateTime EndTime { get; set; }
         public string Purpose { get; set; } = string.Empty;
         public string Status { get; set; } = "Pending"; // Pending / Approved / Rejected / Completed
+        public string? AdminNotes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

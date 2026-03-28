@@ -10,5 +10,11 @@ namespace autobase.Models.ViewModels
         public int ApprovedCount { get; set; }
         public int RejectedCount { get; set; }
         public int CompletedCount { get; set; }
+
+    }
+    public class RequestActionViewModel 
+    {
+        public int Id { get; set; }
+        public string Notes { get; set; } = string.Empty;
     }
 }
