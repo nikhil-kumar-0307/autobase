@@ -1,18 +1,35 @@
-<header class="ab-topbar">
-    <button class="topbar-toggle" onclick="document.getElementById('abSidebar').classList.toggle('open')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
-    </button>
-    <div class="topbar-breadcrumb">
-        <strong>@ViewData["Title"]</strong>
-        <span> / Admin</span>
+<div class="topbar">
+    <!-- Left: Page greeting -->
+    <div class="topbar-left">
+        <div class="topbar-greeting">Good morning, @ViewBag.Name ??</div>
+        <div class="topbar-sub">Here's what's happening today</div>
     </div>
+
+    <!-- Right: Profile + Logout -->
     <div class="topbar-actions">
-        <a asp-controller="Account" asp-action="Logout" class="topbar-btn btn-danger-outline">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Profile Pill -->
+        <a asp-controller="Profile" asp-action="Index" class="topbar-profile-pill">
+            <div class="topbar-avatar">
+                @(ViewBag.Name?.ToString()?.Substring(0, 1).ToUpper() ?? "U")
+            </div>
+            <div class="topbar-profile-info">
+                <div class="topbar-profile-name">@ViewBag.Name</div>
+                <div class="topbar-profile-role">@ViewBag.Role</div>
+            </div>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                 style="flex-shrink:0;color:var(--muted);margin-left:2px;">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        </a>
+
+        <!-- Divider -->
+        <div class="topbar-divider"></div>
+
+        <!-- Logout -->
+        <a asp-controller="Account" asp-action="Logout" class="topbar-logout-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -20,4 +37,4 @@
             Logout
         </a>
     </div>
-</header>
+</div>

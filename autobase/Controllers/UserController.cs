@@ -26,8 +26,9 @@ namespace autobase.Controllers
 
         private bool IsAdminLoggedIn()
         {
+            var role = HttpContext.Session.GetString("UserRole");
             return !string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"))
-                   && HttpContext.Session.GetString("UserRole") == "Admin";
+                   && (role == "Admin" || role == "SuperAdmin");
         }
 
         // ── GET: Add User ──
@@ -47,6 +48,13 @@ namespace autobase.Controllers
 
             if (!ModelState.IsValid)
             {
+                SetUserViewBag();
+                return View(model);
+            }
+            // ── Block Admin from assigning Admin role — only SuperAdmin can ──
+            if (model.Role == "Admin" && HttpContext.Session.GetString("UserRole") != "SuperAdmin")
+            {
+                ModelState.AddModelError("Role", "Only SuperAdmin can assign the Admin role.");
                 SetUserViewBag();
                 return View(model);
             }
@@ -87,7 +95,24 @@ namespace autobase.Controllers
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
             SetUserViewBag();
-            var users = _db.Users.OrderBy(u => u.Name).ToList();
+
+            var currentRole = HttpContext.Session.GetString("UserRole");
+            var currentEmpNo = HttpContext.Session.GetString("UserEmployeeNumber");
+
+            IQueryable<User> query = _db.Users;
+
+            if (currentRole == "Admin")
+            {
+                // Admin sees only Employees — not Admins, not SuperAdmins
+                query = query.Where(u => u.Role == "Employee" || u.Role == "Driver");
+            }
+            else if (currentRole == "SuperAdmin")
+            {
+                // SuperAdmin sees everyone except SuperAdmin accounts
+                query = query.Where(u => u.Role != "SuperAdmin");
+            }
+
+            var users = query.OrderBy(u => u.Name).ToList();
             return View(users);
         }
 
@@ -100,6 +125,19 @@ namespace autobase.Controllers
 
             var user = _db.Users.Find(id);
             if (user == null) return NotFound();
+            // Block editing SuperAdmin account entirely
+            if (user.Role == "SuperAdmin")
+            {
+                TempData["Error"] = "SuperAdmin account cannot be edited.";
+                return RedirectToAction("EditUser");
+            }
+
+            // Block Admin from editing another Admin's account
+            if (user.Role == "Admin" && HttpContext.Session.GetString("UserRole") != "SuperAdmin")
+            {
+                TempData["Error"] = "Only SuperAdmin can edit an Admin account.";
+                return RedirectToAction("EditUser");
+            }
 
             var model = new EditUserViewModel
             {
@@ -127,6 +165,21 @@ namespace autobase.Controllers
 
             var user = _db.Users.Find(model.Id);
             if (user == null) return NotFound();
+
+            // Block Admin from editing another Admin's account
+            if (user.Role == "Admin" && HttpContext.Session.GetString("UserRole") != "SuperAdmin")
+            {
+                TempData["Error"] = "Only SuperAdmin can edit an Admin account.";
+                return RedirectToAction("EditUser");
+            }
+
+            // Block Admin from assigning Admin role to anyone
+            if (model.Role == "Admin" && HttpContext.Session.GetString("UserRole") != "SuperAdmin")
+            {
+                ModelState.AddModelError("Role", "Only SuperAdmin can assign the Admin role.");
+                SetUserViewBag();
+                return View(model);
+            }
 
             // Check duplicate employee number — exclude current user
             if (_db.Users.Any(u => u.EmployeeNumber == model.EmployeeNumber && u.Id != model.Id))

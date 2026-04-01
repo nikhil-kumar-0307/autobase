@@ -140,7 +140,8 @@ namespace autobase.Controllers
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
                 return RedirectToAction("Login", "Account");
-            if (HttpContext.Session.GetString("UserRole") != "Admin")
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "Admin" && role != "SuperAdmin")
                 return RedirectToAction("Dashboard");
 
             ViewBag.Name = HttpContext.Session.GetString("UserName");

@@ -229,6 +229,24 @@
             stroke-linejoin: round;
             flex-shrink: 0;
         }
+
+    .role-superadmin {
+        background: rgba(245, 197, 24, 0.15);
+        color: #92700a;
+    }
+
+    .error-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        border-radius: 10px;
+        padding: 13px 16px;
+        font-size: 13px;
+        color: #c53030;
+        margin-bottom: 22px;
+    }
 </style>
 
 <div class="ab-shell">
@@ -253,6 +271,12 @@
                 <div class="success-alert">
                     <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="error-alert">
+                    ⚠️ @TempData["Error"]
                 </div>
             }
 
@@ -301,8 +325,8 @@
                                         @{
                                             var rc = u.Role switch
                                             {
-                                                "Admin" => "role-admin",
-                                                "Driver" => "role-driver",
+                                                "SuperAdmin" => "role-superadmin",
+                                                "Admin" => "role-admin",               
                                                 _ => "role-employee"
                                             };
                                         }

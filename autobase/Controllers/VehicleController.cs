@@ -24,8 +24,9 @@ namespace autobase.Controllers
 
         private bool IsAdminLoggedIn()
         {
+            var role = HttpContext.Session.GetString("UserRole");
             return !string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"))
-                   && HttpContext.Session.GetString("UserRole") == "Admin";
+                   && (role == "Admin" || role == "SuperAdmin");
         }
 
         // ── GET: Add Vehicle ──
