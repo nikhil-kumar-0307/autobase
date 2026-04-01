@@ -53,36 +53,52 @@ namespace autobase.Controllers
         public IActionResult ChangePassword(ChangePasswordViewModel model)
         {
             if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
-            SetViewBag();
-
-            if (!ModelState.IsValid)
-            {
-                TempData["PasswordError"] = "Please fix the errors below.";
-                return RedirectToAction("Index");
-            }
 
             var userId = HttpContext.Session.GetString("UserId");
             var user = _db.Users.Find(int.Parse(userId!));
             if (user == null) return RedirectToAction("Login", "Account");
 
+            if (!ModelState.IsValid)
+            {
+                TempData["PasswordError"] = "Please fill in all password fields.";
+                // ✅ Redirect based on role
+                return RedirectBasedOnRole(user.Role);
+            }
+
             // Verify current password
             if (!VerifyPassword(model.CurrentPassword, user.Password))
             {
                 TempData["PasswordError"] = "Current password is incorrect.";
-                return RedirectToAction("Index");
+                return RedirectBasedOnRole(user.Role);
             }
 
             if (model.NewPassword != model.ConfirmPassword)
             {
                 TempData["PasswordError"] = "New passwords do not match.";
-                return RedirectToAction("Index");
+                return RedirectBasedOnRole(user.Role);
+            }
+
+            if (model.NewPassword.Length < 4)
+            {
+                TempData["PasswordError"] = "Password must be at least 4 characters.";
+                return RedirectBasedOnRole(user.Role);
             }
 
             user.Password = HashPassword(model.NewPassword);
             _db.SaveChanges();
 
             TempData["PasswordSuccess"] = "Password changed successfully!";
-            return RedirectToAction("Index");
+            return RedirectBasedOnRole(user.Role);
+        }
+
+        // ── Helper: redirect based on role ──
+        private IActionResult RedirectBasedOnRole(string role)
+        {
+            return role switch
+            {
+                "Admin" or "SuperAdmin" => RedirectToAction("Index"),          // stays on profile page
+                _ => RedirectToAction("Dashboard", "Home") // employee goes back to dashboard
+            };
         }
 
         private string HashPassword(string password)

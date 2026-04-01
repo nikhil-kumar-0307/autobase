@@ -26,7 +26,6 @@
         color: var(--text);
     }
 
-    /* ── Layout ── */
     .dash-wrap {
         max-width: 1100px;
         margin: 0 auto;
@@ -47,23 +46,10 @@
         gap: 12px;
     }
 
-    .dash-greeting h2 {
-        font-size: 20px;
-        font-weight: 700;
-        margin: 0 0 4px;
-    }
+    .dash-greeting h2 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .dash-greeting p  { font-size: 13px; color: var(--muted); margin: 0; }
 
-    .dash-greeting p {
-        font-size: 13px;
-        color: var(--muted);
-        margin: 0;
-    }
-
-    .dash-meta {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+    .dash-meta { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .meta-pill {
         background: var(--gray-bg);
@@ -74,10 +60,43 @@
         font-weight: 600;
         color: var(--muted);
     }
+    .meta-pill span { color: var(--text); }
 
-        .meta-pill span {
-            color: var(--text);
-        }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    /* Profile pill button */
+    .profile-pill-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px 6px 6px;
+        border: 1.5px solid var(--border);
+        border-radius: 30px;
+        background: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    .profile-pill-btn:hover {
+        border-color: var(--green);
+        box-shadow: 0 2px 10px rgba(29,158,117,.12);
+    }
+    .profile-pill-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 800;
+        color: #fff;
+        flex-shrink: 0;
+    }
+    .profile-pill-info { line-height: 1.2; }
+    .profile-pill-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .profile-pill-role { font-size: 10px; color: var(--muted); }
 
     .logout-btn {
         background: var(--red-bg);
@@ -90,13 +109,9 @@
         text-decoration: none;
         transition: background .15s;
     }
+    .logout-btn:hover { background: #f9d6d6; color: var(--red); }
 
-        .logout-btn:hover {
-            background: #f9d6d6;
-            color: var(--red);
-        }
-
-    /* ── Alert banners ── */
+    /* ── Alerts ── */
     .flash-success, .flash-error {
         border-radius: 10px;
         padding: 13px 18px;
@@ -107,18 +122,8 @@
         align-items: center;
         gap: 10px;
     }
-
-    .flash-success {
-        background: var(--green-bg);
-        color: var(--green);
-        border: 1px solid #9fe1cb;
-    }
-
-    .flash-error {
-        background: var(--red-bg);
-        color: var(--red);
-        border: 1px solid #f7c1c1;
-    }
+    .flash-success { background: var(--green-bg); color: var(--green); border: 1px solid #9fe1cb; }
+    .flash-error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #f7c1c1; }
 
     /* ── Section title ── */
     .section-title {
@@ -132,13 +137,7 @@
         align-items: center;
         gap: 8px;
     }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
     /* ── Vehicle grid ── */
     .vehicle-grid {
@@ -155,440 +154,268 @@
         overflow: hidden;
         transition: box-shadow .15s, transform .15s;
     }
-
-        .vehicle-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(0,0,0,.07);
-        }
+    .vehicle-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.07); }
 
     .vc-top {
         background: var(--green-bg);
         padding: 18px 20px 14px;
         position: relative;
     }
-
     .vc-type-badge {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: .07em;
+        font-size: 10px; font-weight: 700; letter-spacing: .07em;
         text-transform: uppercase;
-        background: rgba(29,158,117,.15);
-        color: var(--green);
-        padding: 3px 9px;
-        border-radius: 20px;
-        display: inline-block;
-        margin-bottom: 8px;
+        background: rgba(29,158,117,.15); color: var(--green);
+        padding: 3px 9px; border-radius: 20px;
+        display: inline-block; margin-bottom: 8px;
     }
-
-    .vc-name {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text);
-        margin: 0 0 4px;
+    .vc-name { font-size: 16px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+    .vc-reg  {
+        font-family: 'Courier New', monospace; font-size: 12px;
+        background: rgba(255,255,255,.7); color: #444441;
+        padding: 3px 8px; border-radius: 5px; display: inline-block;
     }
-
-    .vc-reg {
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        background: rgba(255,255,255,.7);
-        color: #444441;
-        padding: 3px 8px;
-        border-radius: 5px;
-        display: inline-block;
-    }
-
     .vc-avail-dot {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--green);
-        box-shadow: 0 0 0 3px rgba(29,158,117,.25);
+        position: absolute; top: 16px; right: 16px;
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,.25);
     }
-
-    .vc-body {
-        padding: 14px 20px;
-    }
-
+    .vc-body { padding: 14px 20px; }
     .vc-detail {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        color: var(--muted);
-        margin-bottom: 6px;
+        display: flex; justify-content: space-between;
+        font-size: 12px; color: var(--muted); margin-bottom: 6px;
     }
-
-        .vc-detail strong {
-            color: var(--text);
-            font-weight: 600;
-        }
+    .vc-detail strong { color: var(--text); font-weight: 600; }
 
     .request-btn {
-        display: block;
-        width: 100%;
-        margin-top: 14px;
-        padding: 10px;
-        background: var(--green);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background .15s;
-        text-align: center;
+        display: block; width: 100%; margin-top: 14px; padding: 10px;
+        background: var(--green); color: #fff; border: none; border-radius: 8px;
+        font-size: 13px; font-weight: 700; cursor: pointer;
+        transition: background .15s; text-align: center;
     }
-
-        .request-btn:hover {
-            background: #0f6e56;
-        }
+    .request-btn:hover { background: #0f6e56; }
 
     /* ── Empty state ── */
     .empty-state {
-        text-align: center;
-        padding: 44px 24px;
-        color: var(--muted);
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        margin-bottom: 36px;
+        text-align: center; padding: 44px 24px; color: var(--muted);
+        background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius); margin-bottom: 36px;
     }
+    .empty-state .ei { font-size: 40px; margin-bottom: 10px; }
+    .empty-state p   { font-size: 14px; margin: 0; }
 
-        .empty-state .ei {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            margin: 0;
-        }
-    /* ── In Use vehicles ── */
+    /* ── In Use ── */
     .inuse-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 16px;
-        margin-bottom: 36px;
+        gap: 16px; margin-bottom: 36px;
     }
-
     .inuse-card {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        overflow: hidden;
-        transition: box-shadow .15s;
+        background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius); overflow: hidden; transition: box-shadow .15s;
     }
-
-        .inuse-card:hover {
-            box-shadow: 0 4px 18px rgba(0,0,0,.06);
-        }
-
+    .inuse-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.06); }
     .vc-top-inuse {
-        background: var(--amber-bg);
-        padding: 18px 20px 14px;
-        position: relative;
+        background: var(--amber-bg); padding: 18px 20px 14px; position: relative;
     }
-
     .vc-type-badge-inuse {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: .07em;
-        text-transform: uppercase;
-        background: rgba(186,117,23,.15);
-        color: var(--amber);
-        padding: 3px 9px;
-        border-radius: 20px;
-        display: inline-block;
-        margin-bottom: 8px;
+        font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+        background: rgba(186,117,23,.15); color: var(--amber);
+        padding: 3px 9px; border-radius: 20px; display: inline-block; margin-bottom: 8px;
     }
-
     .vc-avail-dot-inuse {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--amber);
-        box-shadow: 0 0 0 3px rgba(186,117,23,.25);
+        position: absolute; top: 16px; right: 16px;
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--amber); box-shadow: 0 0 0 3px rgba(186,117,23,.25);
     }
-
     .avail-countdown {
-        display: block;
-        margin-top: 12px;
-        padding: 8px 12px;
-        background: var(--amber-bg);
-        border: 1px solid #f0c97a;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--amber);
-        text-align: center;
+        display: block; margin-top: 12px; padding: 8px 12px;
+        background: var(--amber-bg); border: 1px solid #f0c97a;
+        border-radius: 8px; font-size: 12px; font-weight: 700;
+        color: var(--amber); text-align: center;
     }
 
-    /* ── My Requests table ── */
+    /* ── Requests table ── */
     .req-table-wrap {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        overflow: hidden;
-        margin-bottom: 36px;
+        background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius); overflow: hidden; margin-bottom: 36px;
     }
-
-    .req-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
+    .req-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .req-table thead tr { background: var(--gray-bg); border-bottom: 1px solid var(--border); }
+    .req-table th {
+        padding: 11px 16px; text-align: left;
+        font-size: 10.5px; font-weight: 700;
+        letter-spacing: .07em; text-transform: uppercase;
+        color: var(--muted); white-space: nowrap;
     }
-
-        .req-table thead tr {
-            background: var(--gray-bg);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .req-table th {
-            padding: 11px 16px;
-            text-align: left;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: .07em;
-            text-transform: uppercase;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        .req-table tbody tr {
-            border-bottom: 1px solid #f1efe8;
-            transition: background .12s;
-        }
-
-            .req-table tbody tr:last-child {
-                border-bottom: none;
-            }
-
-            .req-table tbody tr:hover {
-                background: var(--gray-bg);
-            }
-
-        .req-table td {
-            padding: 11px 16px;
-            color: var(--text);
-            vertical-align: middle;
-        }
-
+    .req-table tbody tr { border-bottom: 1px solid #f1efe8; transition: background .12s; }
+    .req-table tbody tr:last-child { border-bottom: none; }
+    .req-table tbody tr:hover { background: var(--gray-bg); }
+    .req-table td { padding: 11px 16px; color: var(--text); vertical-align: middle; }
     .req-reg {
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        background: #f1efe8;
-        padding: 2px 7px;
-        border-radius: 4px;
-        color: #444;
+        font-family: 'Courier New', monospace; font-size: 11px;
+        background: #f1efe8; padding: 2px 7px; border-radius: 4px; color: #444;
     }
-
     .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
     }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+    .sb-pending  { background: var(--amber-bg); color: var(--amber); }
+    .sb-pending::before  { background: var(--amber); }
+    .sb-approved { background: var(--green-bg); color: var(--green); }
+    .sb-approved::before { background: var(--green); }
+    .sb-rejected { background: var(--red-bg);   color: var(--red);   }
+    .sb-rejected::before { background: var(--red); }
+    .sb-completed { background: #f1efe8; color: var(--muted); }
+    .sb-completed::before { background: var(--muted); }
 
-        .status-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-    .sb-pending {
-        background: var(--amber-bg);
-        color: var(--amber);
-    }
-
-        .sb-pending::before {
-            background: var(--amber);
-        }
-
-    .sb-approved {
-        background: var(--green-bg);
-        color: var(--green);
-    }
-
-        .sb-approved::before {
-            background: var(--green);
-        }
-
-    .sb-rejected {
-        background: var(--red-bg);
-        color: var(--red);
-    }
-
-        .sb-rejected::before {
-            background: var(--red);
-        }
-
-    .sb-completed {
-        background: #f1efe8;
-        color: var(--muted);
-    }
-
-        .sb-completed::before {
-            background: var(--muted);
-        }
-
-    /* ── Modal overlay ── */
+    /* ── Modal (shared styles) ── */
     .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(44,44,42,.45);
-        z-index: 999;
-        align-items: center;
-        justify-content: center;
+        display: none; position: fixed; inset: 0;
+        background: rgba(44,44,42,.45); z-index: 999;
+        align-items: center; justify-content: center;
     }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
+    .modal-overlay.open { display: flex; }
     .modal-box {
-        background: #fff;
-        border-radius: var(--radius);
-        width: 100%;
-        max-width: 460px;
-        margin: 16px;
-        overflow: hidden;
+        background: #fff; border-radius: var(--radius);
+        width: 100%; max-width: 460px; margin: 16px; overflow: hidden;
         animation: slideUp .2s ease;
     }
-
+    .modal-box-wide { max-width: 560px; }
     @@keyframes slideUp {
-        from {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        from { transform: translateY(20px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
     }
-
     .modal-header {
-        background: var(--green-bg);
-        padding: 18px 22px;
+        background: var(--green-bg); padding: 18px 22px;
         border-bottom: 1px solid #9fe1cb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        display: flex; justify-content: space-between; align-items: center;
     }
-
-        .modal-header h5 {
-            font-size: 15px;
-            font-weight: 700;
-            margin: 0;
-            color: var(--text);
-        }
-
-    .modal-close {
-        background: none;
-        border: none;
-        font-size: 20px;
-        color: var(--muted);
-        cursor: pointer;
-        line-height: 1;
-    }
-
-    .modal-body {
-        padding: 22px;
-    }
-
+    .modal-header h5 { font-size: 15px; font-weight: 700; margin: 0; color: var(--text); }
+    .modal-close { background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; }
+    .modal-body  { padding: 22px; }
     .modal-vehicle-info {
-        background: var(--gray-bg);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 18px;
-        font-size: 13px;
+        background: var(--gray-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; font-size: 13px;
     }
+    .modal-vehicle-info strong { font-size: 15px; display: block; margin-bottom: 4px; }
 
-        .modal-vehicle-info strong {
-            font-size: 15px;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-    .form-group {
-        margin-bottom: 16px;
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+        display: block; font-size: 12px; font-weight: 700;
+        color: var(--muted); margin-bottom: 6px;
+        letter-spacing: .05em; text-transform: uppercase;
     }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--muted);
-            margin-bottom: 6px;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 10px 13px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--text);
-            background: #fff;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color .15s;
-        }
-
-            .form-group input:focus,
-            .form-group textarea:focus {
-                border-color: var(--green);
-            }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+    .form-group input,
+    .form-group textarea {
+        width: 100%; padding: 10px 13px;
+        border: 1px solid var(--border); border-radius: 8px;
+        font-size: 13px; color: var(--text); background: #fff;
+        box-sizing: border-box; outline: none; transition: border-color .15s;
     }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--green); }
+    .form-group input[readonly] { background: var(--gray-bg); color: var(--muted); cursor: not-allowed; }
 
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .duration-display {
-        background: var(--green-bg);
-        border: 1px solid #9fe1cb;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--green);
-        margin-bottom: 16px;
-        text-align: center;
+        background: var(--green-bg); border: 1px solid #9fe1cb;
+        border-radius: 8px; padding: 10px 14px; font-size: 13px;
+        font-weight: 700; color: var(--green); margin-bottom: 16px; text-align: center;
     }
-
     .submit-btn {
-        width: 100%;
-        padding: 12px;
-        background: var(--green);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background .15s;
+        width: 100%; padding: 12px; background: var(--green); color: #fff;
+        border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+        cursor: pointer; transition: background .15s;
+    }
+    .submit-btn:hover { background: #0f6e56; }
+
+    /* ── Profile modal specific ── */
+    .profile-modal-header {
+        background: linear-gradient(135deg, #1d9e75 0%, #0f6e56 100%);
+        padding: 0;
+        border-bottom: none;
+    }
+    .profile-modal-banner {
+        padding: 28px 22px 50px;
+        position: relative;
+    }
+    .profile-modal-banner h5 {
+        font-size: 15px; font-weight: 700; margin: 0; color: #fff;
+    }
+    .profile-modal-banner p { font-size: 12px; color: rgba(255,255,255,.7); margin: 4px 0 0; }
+    .profile-modal-close {
+        position: absolute; top: 16px; right: 16px;
+        background: rgba(255,255,255,.2); border: none;
+        border-radius: 50%; width: 28px; height: 28px;
+        font-size: 16px; color: #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .profile-avatar-wrap {
+        display: flex; align-items: flex-end;
+        padding: 0 22px; margin-top: -30px; margin-bottom: 16px; gap: 14px;
+    }
+    .profile-avatar-circle {
+        width: 60px; height: 60px; border-radius: 50%;
+        background: #fff; border: 3px solid #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; font-weight: 800; color: var(--green);
+        box-shadow: 0 4px 14px rgba(0,0,0,.12); flex-shrink: 0;
+    }
+    .profile-avatar-info { padding-bottom: 4px; }
+    .profile-avatar-name { font-size: 16px; font-weight: 700; color: var(--text); }
+    .profile-avatar-emp  { font-size: 12px; color: var(--muted); font-family: monospace; }
+
+    .profile-role-pill {
+        display: inline-flex; padding: 3px 12px; border-radius: 20px;
+        font-size: 11px; font-weight: 700; margin-bottom: 16px; margin-left: 22px;
+    }
+    .pill-superadmin { background: rgba(245,197,24,.15); color: #92700a; }
+    .pill-admin      { background: rgba(168,85,247,.1);  color: #9333ea; }
+    .pill-driver     { background: rgba(59,130,246,.1);  color: #2563eb; }
+    .pill-employee   { background: rgba(29,158,117,.1);  color: #1d9e75; }
+
+    .profile-tabs {
+        display: flex; border-bottom: 1px solid var(--border);
+        padding: 0 22px; gap: 0;
+    }
+    .profile-tab {
+        padding: 10px 18px; font-size: 13px; font-weight: 600;
+        color: var(--muted); border-bottom: 2px solid transparent;
+        cursor: pointer; transition: color .15s, border-color .15s;
+        margin-bottom: -1px; background: none; border-top: none;
+        border-left: none; border-right: none;
+    }
+    .profile-tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .profile-tab-content { display: none; padding: 20px 22px; }
+    .profile-tab-content.active { display: block; }
+
+    .info-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .info-value { font-weight: 600; color: var(--text); font-family: monospace; }
+
+    .pw-wrap-modal { position: relative; }
+    .pw-wrap-modal input { padding-right: 44px !important; }
+    .pw-toggle-modal {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; cursor: pointer; color: var(--muted);
+        font-size: 15px; line-height: 1;
     }
 
-        .submit-btn:hover {
-            background: #0f6e56;
-        }
+    .alert-sm-success {
+        background: var(--green-bg); border: 1px solid #9fe1cb;
+        border-radius: 8px; padding: 10px 14px;
+        font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 14px;
+    }
+    .alert-sm-error {
+        background: var(--red-bg); border: 1px solid #f7c1c1;
+        border-radius: 8px; padding: 10px 14px;
+        font-size: 12px; font-weight: 600; color: var(--red); margin-bottom: 14px;
+    }
 </style>
 
 <div class="dash-wrap">
@@ -614,18 +441,29 @@
             <div class="meta-pill">Mobile: <span>@Model.Mobile</span></div>
             <div class="meta-pill">Role: <span>@Model.Role</span></div>
         </div>
-        <a asp-controller="Account" asp-action="Logout" class="logout-btn">🚪 Logout</a>
+
+        <!-- ── Topbar right actions ── -->
+        <div class="topbar-right">
+            <!-- Profile pill -->
+            <button class="profile-pill-btn" onclick="openProfileModal()">
+                <div class="profile-pill-avatar">
+                    @Model.UserName.Substring(0, 1).ToUpper()
+                </div>
+                <div class="profile-pill-info">
+                    <div class="profile-pill-name">@Model.UserName</div>
+                    <div class="profile-pill-role">@Model.Role</div>
+                </div>
+            </button>
+            <!-- Logout -->
+            <a asp-controller="Account" asp-action="Logout" class="logout-btn">🚪 Logout</a>
+        </div>
     </div>
 
     @* ── Available Vehicles ── *@
     <div class="section-title">🚗 Available Vehicles (@Model.AvailableVehicles.Count)</div>
-
     @if (!Model.AvailableVehicles.Any())
     {
-        <div class="empty-state">
-            <div class="ei">🚘</div>
-            <p>No vehicles are available right now. Please check back later.</p>
-        </div>
+        <div class="empty-state"><div class="ei">🚘</div><p>No vehicles are available right now.</p></div>
     }
     else
     {
@@ -640,19 +478,13 @@
                         <div class="vc-reg">@v.RegistrationNumber</div>
                     </div>
                     <div class="vc-body">
-                        <div class="vc-detail">
-                            <span>Year</span>
-                            <strong>@v.Year</strong>
-                        </div>
-                        <div class="vc-detail">
-                            <span>Status</span>
-                            <strong style="color: var(--green);">Available</strong>
-                        </div>
+                        <div class="vc-detail"><span>Year</span><strong>@v.Year</strong></div>
+                        <div class="vc-detail"><span>Status</span><strong style="color:var(--green);">Available</strong></div>
                         @if (!string.IsNullOrEmpty(v.Notes))
                         {
                             <div class="vc-detail">
                                 <span>Notes</span>
-                                <strong style="font-size:11px; max-width:140px; text-align:right;">@v.Notes</strong>
+                                <strong style="font-size:11px;max-width:140px;text-align:right;">@v.Notes</strong>
                             </div>
                         }
                         <button class="request-btn"
@@ -664,15 +496,12 @@
             }
         </div>
     }
-    @* ── In Use Vehicles ── *@
-    <div class="section-title">🔑 In Use (@Model.InUseVehicles.Count)</div>
 
+    @* ── In Use ── *@
+    <div class="section-title">🔑 In Use (@Model.InUseVehicles.Count)</div>
     @if (!Model.InUseVehicles.Any())
     {
-        <div class="empty-state">
-            <div class="ei">✅</div>
-            <p>No vehicles are currently in use.</p>
-        </div>
+        <div class="empty-state"><div class="ei">✅</div><p>No vehicles are currently in use.</p></div>
     }
     else
     {
@@ -682,24 +511,17 @@
                 var remaining = v.EndTime - DateTime.Now;
                 string countdownText;
                 string countdownStyle = "";
-
                 if (remaining.TotalMinutes <= 0)
                 {
                     countdownText = "⚠️ Overdue — should have returned by " + v.EndTime.ToString("hh:mm tt");
-                    countdownStyle = "background:#fcebeb; border-color:#f7c1c1; color:#a32d2d;";
+                    countdownStyle = "background:#fcebeb;border-color:#f7c1c1;color:#a32d2d;";
                 }
                 else if (remaining.TotalMinutes < 60)
-                {
                     countdownText = $"⏳ Available in ~{(int)remaining.TotalMinutes} min";
-                }
                 else if (remaining.TotalHours < 24)
-                {
                     countdownText = $"⏳ Available at {v.EndTime:hh:mm tt} today";
-                }
                 else
-                {
                     countdownText = $"⏳ Available on {v.EndTime:dd MMM} at {v.EndTime:hh:mm tt}";
-                }
 
                 <div class="inuse-card">
                     <div class="vc-top-inuse">
@@ -709,18 +531,9 @@
                         <div class="vc-reg">@v.RegistrationNumber</div>
                     </div>
                     <div class="vc-body">
-                        <div class="vc-detail">
-                            <span>In use by</span>
-                            <strong>@v.UserName</strong>
-                        </div>
-                        <div class="vc-detail">
-                            <span>Emp No</span>
-                            <strong>@v.EmployeeNumber</strong>
-                        </div>
-                        <div class="vc-detail">
-                            <span>Due back</span>
-                            <strong style="font-size:11px;">@v.EndTime.ToString("dd MMM, hh:mm tt")</strong>
-                        </div>
+                        <div class="vc-detail"><span>In use by</span><strong>@v.UserName</strong></div>
+                        <div class="vc-detail"><span>Emp No</span><strong>@v.EmployeeNumber</strong></div>
+                        <div class="vc-detail"><span>Due back</span><strong style="font-size:11px;">@v.EndTime.ToString("dd MMM, hh:mm tt")</strong></div>
                         <span class="avail-countdown" style="@countdownStyle">@countdownText</span>
                     </div>
                 </div>
@@ -730,13 +543,9 @@
 
     @* ── My Requests ── *@
     <div class="section-title">📋 My Requests (@Model.MyRequests.Count)</div>
-
     @if (!Model.MyRequests.Any())
     {
-        <div class="empty-state">
-            <div class="ei">📭</div>
-            <p>You haven't made any vehicle requests yet.</p>
-        </div>
+        <div class="empty-state"><div class="ei">📭</div><p>You haven't made any vehicle requests yet.</p></div>
     }
     else
     {
@@ -744,93 +553,62 @@
             <table class="req-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Vehicle</th>
-                        <th>Reg No</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Duration</th>
-                        <th>Purpose</th>
-                        <th>Status</th>
-                        <th>Admin Notes</th>
-                        <th>Action</th>  
+                        <th>#</th><th>Vehicle</th><th>Reg No</th>
+                        <th>Start</th><th>End</th><th>Duration</th>
+                        <th>Purpose</th><th>Status</th><th>Admin Notes</th><th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @{
-                        int i = 1;
-                    }
+                    @{ int i = 1; }
                     @foreach (var r in Model.MyRequests)
                     {
                         string sbClass = r.Status.ToLower() switch
                         {
-                            "pending" => "sb-pending",
-                            "approved" => "sb-approved",
-                            "rejected" => "sb-rejected",
+                            "pending"   => "sb-pending",
+                            "approved"  => "sb-approved",
+                            "rejected"  => "sb-rejected",
                             "completed" => "sb-completed",
-                            _ => "sb-pending"
+                            _           => "sb-pending"
                         };
                         double hrs = (r.EndTime - r.StartTime).TotalHours;
                         string duration = hrs >= 24
-                        ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
-                        : $"{hrs:F1} hrs";
+                            ? $"{(int)(hrs/24)}d {(int)(hrs%24)}h"
+                            : $"{hrs:F1} hrs";
 
                         <tr>
-                            <td style="color:#b4b2a9; font-size:12px;">@i</td>
+                            <td style="color:#b4b2a9;font-size:12px;">@i</td>
                             <td style="font-weight:600;">@r.VehicleName</td>
                             <td><span class="req-reg">@r.RegistrationNumber</span></td>
                             <td style="font-size:12px;">@r.StartTime.ToString("dd MMM, hh:mm tt")</td>
                             <td style="font-size:12px;">@r.EndTime.ToString("dd MMM, hh:mm tt")</td>
-                            <td style="font-weight:700; color: var(--blue); font-size:12px;">@duration</td>
-                            <td style="color:var(--muted); font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <td style="font-weight:700;color:var(--blue);font-size:12px;">@duration</td>
+                            <td style="color:var(--muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                 @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
                             </td>
                             <td><span class="status-badge @sbClass">@r.Status</span></td>
-
                             <td>
                                 @if (!string.IsNullOrEmpty(r.AdminNotes))
                                 {
-                                    string noteClass = (r.Status == "Approved" || r.Status == "Completed")
-                                    ? "color: var(--green); background: var(--green-bg); border: 1px solid #9fe1cb;"
-                                    : "color: var(--red); background: var(--red-bg); border: 1px solid #f7c1c1;";
-
-                                    <span style="display:inline-block; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; vertical-align:middle; @noteClass"
-                                          title="@r.AdminNotes">
-                                        💬 @r.AdminNotes
-                                    </span>
+                                    string noteStyle = (r.Status == "Approved" || r.Status == "Completed")
+                                        ? "color:var(--green);background:var(--green-bg);border:1px solid #9fe1cb;"
+                                        : "color:var(--red);background:var(--red-bg);border:1px solid #f7c1c1;";
+                                    <span style="display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;vertical-align:middle;@noteStyle"
+                                          title="@r.AdminNotes">💬 @r.AdminNotes</span>
                                 }
-                                else
-                                {
-                                    <span style="font-size:11px; color:#ccc;">—</span>
-                                }
+                                else { <span style="font-size:11px;color:#ccc;">—</span> }
                             </td>
-
-                            @* ── Action column ── *@
                             <td>
                                 @if (r.Status == "Approved")
                                 {
                                     <form asp-controller="Home" asp-action="ReturnVehicle" method="post"
                                           onsubmit="return confirm('Are you sure you want to return @r.VehicleName?')">
                                         <input type="hidden" name="id" value="@r.Id" />
-                                        <button type="submit" style="
-                                        background: #e1f5ee;
-                                        color: #1d9e75;
-                                        border: 1px solid #9fe1cb;
-                                        border-radius: 7px;
-                                        padding: 5px 12px;
-                                        font-size: 11px;
-                                        font-weight: 700;
-                                        cursor: pointer;
-                                        white-space: nowrap;
-                                        transition: opacity .15s;">
+                                        <button type="submit" style="background:#e1f5ee;color:#1d9e75;border:1px solid #9fe1cb;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">
                                             ✔ Return Vehicle
                                         </button>
                                     </form>
                                 }
-                                else
-                                {
-                                    <span style="font-size:11px; color:#b4b2a9;">—</span>
-                                }
+                                else { <span style="font-size:11px;color:#b4b2a9;">—</span> }
                             </td>
                         </tr>
                         i++;
@@ -851,76 +629,187 @@
         <div class="modal-body">
             <div class="modal-vehicle-info">
                 <strong id="modalVehicleName">—</strong>
-                <span id="modalVehicleReg" style="font-family: monospace; font-size:12px; background:#e8e6de; padding:2px 7px; border-radius:4px;"></span>
-                &nbsp;
-                <span id="modalVehicleType" style="font-size:12px; color: var(--muted);"></span>
+                <span id="modalVehicleReg" style="font-family:monospace;font-size:12px;background:#e8e6de;padding:2px 7px;border-radius:4px;"></span>
+                &nbsp;<span id="modalVehicleType" style="font-size:12px;color:var(--muted);"></span>
             </div>
-
             <form asp-controller="Home" asp-action="RequestVehicle" method="post">
                 <input type="hidden" name="VehicleId" id="modalVehicleId" />
-
                 <div class="form-row">
                     <div class="form-group">
                         <label>Start Date & Time</label>
-                        <input type="datetime-local" name="StartTime" id="startTime" required
-                               onchange="updateDuration()" />
+                        <input type="datetime-local" name="StartTime" id="startTime" required onchange="updateDuration()" />
                     </div>
                     <div class="form-group">
                         <label>End Date & Time</label>
-                        <input type="datetime-local" name="EndTime" id="endTime" required
-                               onchange="updateDuration()" />
+                        <input type="datetime-local" name="EndTime" id="endTime" required onchange="updateDuration()" />
                     </div>
                 </div>
-
-                <div class="duration-display" id="durationDisplay">
-                    Select start and end time to see duration
-                </div>
-
+                <div class="duration-display" id="durationDisplay">Select start and end time to see duration</div>
                 <div class="form-group">
                     <label>Purpose / Destination</label>
-                    <textarea name="Purpose" rows="3"
-                              placeholder="e.g. Client visit to Chennai airport, Site inspection at Tambaram..."
-                              required></textarea>
+                    <textarea name="Purpose" rows="3" placeholder="e.g. Client visit to Chennai airport..." required></textarea>
                 </div>
-
                 <button type="submit" class="submit-btn">Submit Request →</button>
             </form>
         </div>
     </div>
 </div>
 
+@* ── Profile Modal ── *@
+<div class="modal-overlay" id="profileModal">
+    <div class="modal-box modal-box-wide">
+
+        <!-- Green banner header -->
+        <div class="profile-modal-header">
+            <div class="profile-modal-banner">
+                <h5>My Profile</h5>
+                <p>View your account details and change your password</p>
+                <button class="profile-modal-close" onclick="closeProfileModal()">✕</button>
+            </div>
+        </div>
+
+        <!-- Avatar + name row -->
+        <div class="profile-avatar-wrap">
+            <div class="profile-avatar-circle">
+                @Model.UserName.Substring(0, 1).ToUpper()
+            </div>
+            <div class="profile-avatar-info">
+                <div class="profile-avatar-name">@Model.UserName</div>
+                <div class="profile-avatar-emp">#@Model.EmployeeNumber</div>
+            </div>
+        </div>
+
+        @{
+            var pillCls = Model.Role switch
+            {
+                "SuperAdmin" => "pill-superadmin",
+                "Admin"      => "pill-admin",
+                "Driver"     => "pill-driver",
+                _            => "pill-employee"
+            };
+        }
+        <span class="profile-role-pill @pillCls">@Model.Role</span>
+
+        <!-- Tabs -->
+        <div class="profile-tabs">
+            <button class="profile-tab active" onclick="switchTab('tabInfo', this)">Account Info</button>
+            <button class="profile-tab"        onclick="switchTab('tabPw',   this)">Change Password</button>
+        </div>
+
+        <!-- Tab: Info -->
+        <div class="profile-tab-content active" id="tabInfo">
+            <div class="info-row">
+                <span class="info-label">Full Name</span>
+                <span class="info-value">@Model.UserName</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Employee Number</span>
+                <span class="info-value">#@Model.EmployeeNumber</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Mobile Number</span>
+                <span class="info-value">@Model.Mobile</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Role</span>
+                <span class="info-value">@Model.Role</span>
+            </div>
+        </div>
+
+        <!-- Tab: Change Password -->
+        <div class="profile-tab-content" id="tabPw">
+
+            @if (TempData["PasswordSuccess"] != null)
+            {
+                <div class="alert-sm-success">✅ @TempData["PasswordSuccess"]</div>
+            }
+            @if (TempData["PasswordError"] != null)
+            {
+                <div class="alert-sm-error">⚠️ @TempData["PasswordError"]</div>
+            }
+
+            <form asp-controller="Profile" asp-action="ChangePassword" method="post">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <div class="pw-wrap-modal">
+                        <input type="password" id="pwCurrent" name="CurrentPassword" placeholder="Enter current password" />
+                        <button type="button" class="pw-toggle-modal" onclick="togglePw('pwCurrent')">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <div class="pw-wrap-modal">
+                        <input type="password" id="pwNew" name="NewPassword" placeholder="Min. 4 characters" />
+                        <button type="button" class="pw-toggle-modal" onclick="togglePw('pwNew')">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <div class="pw-wrap-modal">
+                        <input type="password" id="pwConfirm" name="ConfirmPassword" placeholder="Re-enter new password" />
+                        <button type="button" class="pw-toggle-modal" onclick="togglePw('pwConfirm')">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">🔒 Update Password</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        /* ── Request modal ── */
         function openModal(id, name, reg, type) {
-            document.getElementById('modalVehicleId').value  = id;
+            document.getElementById('modalVehicleId').value         = id;
             document.getElementById('modalVehicleName').textContent = name;
             document.getElementById('modalVehicleReg').textContent  = reg;
             document.getElementById('modalVehicleType').textContent = type;
-
-            // Default start = now, end = now + 2 hours
-            const now = new Date();
+            const now   = new Date();
             const later = new Date(now.getTime() + 2 * 60 * 60 * 1000);
             document.getElementById('startTime').value = toLocalISO(now);
             document.getElementById('endTime').value   = toLocalISO(later);
             updateDuration();
-
             document.getElementById('requestModal').classList.add('open');
         }
+        function closeModal() { document.getElementById('requestModal').classList.remove('open'); }
+        document.getElementById('requestModal').addEventListener('click', function(e) { if (e.target===this) closeModal(); });
 
-        function closeModal() {
-            document.getElementById('requestModal').classList.remove('open');
+        /* ── Profile modal ── */
+        function openProfileModal() { document.getElementById('profileModal').classList.add('open'); }
+        function closeProfileModal(){ document.getElementById('profileModal').classList.remove('open'); }
+        document.getElementById('profileModal').addEventListener('click', function(e) { if (e.target===this) closeProfileModal(); });
+
+        /* ── Tabs ── */
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.profile-tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
         }
 
-        // Close on backdrop click
-        document.getElementById('requestModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
+        /* ── Auto-open Change Password tab if there's a password alert ── */
+        @if (TempData["PasswordSuccess"] != null || TempData["PasswordError"] != null)
+        {
+            <text>
+            window.addEventListener('DOMContentLoaded', function() {
+                openProfileModal();
+                switchTab('tabPw', document.querySelectorAll('.profile-tab')[1]);
+            });
+            </text>
+        }
 
+        /* ── Password toggle ── */
+        function togglePw(id) {
+            const i = document.getElementById(id);
+            i.type = i.type === 'password' ? 'text' : 'password';
+        }
+
+        /* ── Duration ── */
         function toLocalISO(date) {
-            const pad = n => String(n).padStart(2, '0');
+            const pad = n => String(n).padStart(2,'0');
             return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
         }
-
         function updateDuration() {
             const s = document.getElementById('startTime').value;
             const e = document.getElementById('endTime').value;
@@ -928,20 +817,15 @@
             if (!s || !e) return;
             const diffMs = new Date(e) - new Date(s);
             if (diffMs <= 0) {
-                el.style.background = '#fcebeb';
-                el.style.color = '#a32d2d';
-                el.style.borderColor = '#f7c1c1';
-                el.textContent = '⚠️ End time must be after start time';
-                return;
+                el.style.cssText = 'background:#fcebeb;color:#a32d2d;border-color:#f7c1c1;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;text-align:center;';
+                el.textContent = '⚠️ End time must be after start time'; return;
             }
-            el.style.background = '#e1f5ee';
-            el.style.color = '#1d9e75';
-            el.style.borderColor = '#9fe1cb';
-            const hrs  = Math.floor(diffMs / 3600000);
-            const mins = Math.floor((diffMs % 3600000) / 60000);
+            el.style.cssText = 'background:#e1f5ee;color:#1d9e75;border-color:#9fe1cb;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;text-align:center;border:1px solid;';
+            const hrs  = Math.floor(diffMs/3600000);
+            const mins = Math.floor((diffMs%3600000)/60000);
             el.textContent = hrs > 0
-                ? `⏱ Duration: ${hrs} hour${hrs !== 1 ? 's' : ''} ${mins > 0 ? mins + ' min' : ''}`
-                : `⏱ Duration: ${mins} minute${mins !== 1 ? 's' : ''}`;
+                ? `⏱ Duration: ${hrs} hour${hrs!==1?'s':''} ${mins>0?mins+' min':''}`
+                : `⏱ Duration: ${mins} minute${mins!==1?'s':''}`;
         }
     </script>
 }
