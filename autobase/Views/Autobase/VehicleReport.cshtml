@@ -1,0 +1,869 @@
+﻿@model autobase.Models.ViewModels.VehicleReportViewModel
+@{
+    ViewData["Title"] = "Vehicle Report";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    var trendLinesJson = System.Text.Json.JsonSerializer.Serialize(Model.TrendLines);
+    var trendLabelsJson = System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels);
+    var vehicleNamesJson = System.Text.Json.JsonSerializer.Serialize(Model.VehicleNames);
+    var usedTripsJson = System.Text.Json.JsonSerializer.Serialize(Model.UsedTrips);
+    var availDaysJson = System.Text.Json.JsonSerializer.Serialize(Model.AvailableDays);
+}
+<link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+    /* ── Reset ── */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    /* ══════════════════════════════════════════════
+       FIX 1: Variables on :root so they are global
+       and never overridden by scoped opacity/color
+       ══════════════════════════════════════════════ */
+    :root {
+        --red: #d62839;
+        --red-dk: #b01e2d;
+        --blue: #1a3a6b;
+        --blue-md: #2251a3;
+        --blue-lt: rgba(34,81,163,0.07);
+        --white: #ffffff;
+        --off: #f7f8fc;
+        --border: #e2e5f0;
+        --border2: #c8cfe6;
+        --ink: #0d1329;
+        --ink2: #2c3454;
+        --muted: #7580a0;
+        --muted2: #a8b0cc;
+        --success: #17a34a;
+        --warn: #d97706;
+        --r: 14px;
+        --r-sm: 9px;
+    }
+
+    /* ══════════════════════════════════════════════
+       FIX 2: Full-screen shell layout
+       Force ab-shell to fill viewport, ab-main to
+       take up remaining width beside the sidebar
+       ══════════════════════════════════════════════ */
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Ensure the layout shell spans the full screen */
+    .ab-shell {
+        display: flex !important;
+        flex-direction: row !important;
+        min-height: 100vh !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        opacity: 1 !important;
+        background: #f0f2f9 !important;
+    }
+
+    /* Main area fills remaining space */
+    .ab-main {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        width: 0 !important; /* triggers flex to grow */
+        display: flex !important;
+        flex-direction: column !important;
+        overflow-x: hidden !important;
+        opacity: 1 !important;
+        background: #f0f2f9 !important;
+    }
+
+    /* Content padding area */
+    .ab-content {
+        flex: 1;
+        padding: 24px 28px 32px;
+        overflow-y: auto;
+        opacity: 1 !important;
+    }
+
+    /* ══════════════════════════════════════════════
+       FIX 3: Force full opacity on all vr elements
+       (prevents any inherited opacity wash-out)
+       ══════════════════════════════════════════════ */
+    .vr, .vr * {
+        font-family: 'Nunito', sans-serif;
+        color: inherit;
+    }
+
+    /* Ensure nothing is transparent or faded */
+    .vr-stat, .vr-card, .vr-hero {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* ── Breadcrumb ── */
+    .vr-crumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+        .vr-crumb a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+            .vr-crumb a:hover {
+                color: var(--blue-md);
+            }
+
+        .vr-crumb .cur {
+            color: var(--ink2);
+            font-weight: 700;
+        }
+
+    /* ── Hero ── */
+    .vr-hero {
+        display: flex;
+        align-items: stretch;
+        border-radius: var(--r);
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(26,58,107,0.18);
+        margin-bottom: 26px;
+        animation: heroIn .45s cubic-bezier(.22,1,.36,1) both;
+    }
+    @@keyframes heroIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-8px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+
+    }
+
+    .vr-hero-stripe {
+        width: 8px;
+        background: linear-gradient(180deg, var(--red), var(--red-dk));
+        flex-shrink: 0;
+    }
+
+    .vr-hero-body {
+        flex: 1;
+        background: linear-gradient(110deg, var(--blue) 0%, var(--blue-md) 100%);
+        padding: 22px 28px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vr-hero-body::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,.07);
+            right: -50px;
+            top: -70px;
+        }
+
+    .vr-hero-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 13px;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.18);
+        border: 1.5px solid rgba(255,255,255,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+        .vr-hero-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .vr-hero-text {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .vr-hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 5px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .vr-hero-tag-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--red);
+    }
+
+    .vr-hero-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.1;
+    }
+
+        .vr-hero-title span {
+            color: #ff8a95;
+        }
+
+    .vr-hero-sub {
+        font-size: 13px;
+        color: rgba(255,255,255,0.55);
+        margin-top: 4px;
+    }
+
+    /* Period toggle */
+    .vr-period-wrap {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 4px;
+        background: rgba(255,255,255,0.12);
+        padding: 3px;
+        border-radius: 8px;
+    }
+
+    .vr-period-btn {
+        padding: 7px 18px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        background: transparent;
+        color: rgba(255,255,255,0.65);
+        transition: all .15s;
+    }
+
+        .vr-period-btn.active {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+        }
+
+    /* ── Summary Stat Cards ── */
+    .vr-stats {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .vr-stat {
+        background: #ffffff;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r);
+        padding: 18px 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(26,58,107,0.06);
+        animation: cardUp .45s cubic-bezier(.22,1,.36,1) both;
+    }
+
+        .vr-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .vr-stat.s-total::before {
+            background: linear-gradient(90deg, var(--blue), var(--blue-md));
+        }
+
+        .vr-stat.s-used::before {
+            background: linear-gradient(90deg, var(--red), var(--red-dk));
+        }
+
+        .vr-stat.s-avail::before {
+            background: linear-gradient(90deg, #17a34a, #15803d);
+        }
+
+        .vr-stat.s-util::before {
+            background: linear-gradient(90deg, var(--warn), #b45309);
+        }
+
+    @@keyframes cardUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .vr-stat:nth-child(1) {
+        animation-delay: .05s;
+    }
+
+    .vr-stat:nth-child(2) {
+        animation-delay: .10s;
+    }
+
+    .vr-stat:nth-child(3) {
+        animation-delay: .15s;
+    }
+
+    .vr-stat:nth-child(4) {
+        animation-delay: .20s;
+    }
+
+    .vr-stat-lbl {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .vr-stat-num {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1;
+    }
+
+    .vr-stat-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+    }
+
+    .vr-stat-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 6px;
+    }
+
+    .badge-up {
+        background: rgba(23,163,74,.12);
+        color: #15803d;
+    }
+
+    .badge-down {
+        background: rgba(214,40,57,.10);
+        color: var(--red-dk);
+    }
+
+    .badge-neutral {
+        background: rgba(34,81,163,0.10);
+        color: var(--blue-md);
+    }
+
+    /* ── Chart Grid ── */
+    .vr-chart-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .vr-chart-full {
+        margin-bottom: 16px;
+    }
+
+    /* ── Chart Card ── */
+    .vr-card {
+        background: #ffffff;
+        border: 1.5px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(26,58,107,0.06);
+        animation: cardUp .45s cubic-bezier(.22,1,.36,1) .25s both;
+    }
+
+    .vr-card-accent {
+        height: 3px;
+        background: linear-gradient(90deg, var(--red), var(--blue-md));
+    }
+
+    .vr-card-hd {
+        padding: 16px 20px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .vr-card-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink2);
+        letter-spacing: .01em;
+    }
+
+    .vr-card-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .vr-card-bd {
+        padding: 16px 20px 20px;
+    }
+
+    /* Legend */
+    .vr-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .vr-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .vr-legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    /* Rank list */
+    .vr-rank {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 20px 20px;
+    }
+
+    .vr-rank-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vr-rank-pos {
+        width: 18px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted2);
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .vr-rank-name {
+        width: 110px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink2);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .vr-rank-track {
+        flex: 1;
+        background: var(--off);
+        border-radius: 3px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .vr-rank-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width .6s cubic-bezier(.22,1,.36,1);
+    }
+
+    .vr-rank-val {
+        width: 32px;
+        font-size: 12px;
+        color: var(--muted);
+        text-align: right;
+        flex-shrink: 0;
+        font-weight: 600;
+    }
+
+    /* ── Responsive ── */
+    @@media (max-width: 900px) {
+        .vr-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .vr-chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 560px) {
+        .vr-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .vr-hero-title {
+            font-size: 20px;
+        }
+
+        .vr-period-wrap {
+            display: none;
+        }
+    }
+</style>
+
+<div class="ab-shell vr">
+    @await Html.PartialAsync("_AdminSidebar")
+    <div class="ab-main">
+        @await Html.PartialAsync("_AdminTopbar")
+        <div class="ab-content">
+
+            <!-- Breadcrumb -->
+            <nav class="vr-crumb">
+                <a href="#">Dashboard</a>
+                <span>›</span>
+                <a href="#">Fleet</a>
+                <span>›</span>
+                <span class="cur">Vehicle Report</span>
+            </nav>
+
+            <!-- Hero -->
+            <div class="vr-hero">
+                <div class="vr-hero-stripe"></div>
+                <div class="vr-hero-body">
+                    <div class="vr-hero-icon">
+                        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+                    </div>
+                    <div class="vr-hero-text">
+                        <div class="vr-hero-tag"><span class="vr-hero-tag-dot"></span>Analytics</div>
+                        <div class="vr-hero-title">Fleet <span>Usage Report</span></div>
+                        <div class="vr-hero-sub">Vehicle utilisation, availability, and trend analysis</div>
+                    </div>
+                    <form method="get" id="periodForm">
+                        <div class="vr-period-wrap">
+                            <button type="button" class="vr-period-btn @(Model.Period == "week" ? "active" : "")"
+                                    onclick="setPeriod('week')">
+                                Weekly
+                            </button>
+                            <button type="button" class="vr-period-btn @(Model.Period == "month" ? "active" : "")"
+                                    onclick="setPeriod('month')">
+                                Monthly
+                            </button>
+                            <input type="hidden" name="period" id="periodInput" value="@Model.Period" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="vr-stats">
+                <div class="vr-stat s-total">
+                    <div class="vr-stat-lbl">Total requests</div>
+                    <div class="vr-stat-num">@Model.TotalRequests</div>
+                    <div class="vr-stat-sub">@(Model.Period == "week" ? "This week" : "This month")</div>
+                </div>
+                <div class="vr-stat s-used">
+                    <div class="vr-stat-lbl">Most used</div>
+                    <div class="vr-stat-num" style="font-size:18px;padding-top:3px">@Model.MostUsedVehicle</div>
+                    <span class="vr-stat-badge badge-up">@Model.MostUsedTrips trips</span>
+                </div>
+                <div class="vr-stat s-avail">
+                    <div class="vr-stat-lbl">Most available</div>
+                    <div class="vr-stat-num" style="font-size:18px;padding-top:3px">@Model.MostAvailableVehicle</div>
+                    <span class="vr-stat-badge badge-neutral">@Model.MostAvailableDays days free</span>
+                </div>
+                <div class="vr-stat s-util">
+                    <div class="vr-stat-lbl">Utilisation rate</div>
+                    <div class="vr-stat-num">@Model.UtilisationPercent%</div>
+                    <div class="vr-stat-sub">of fleet active</div>
+                </div>
+            </div>
+
+            <!-- Most Used + Most Available charts -->
+            <div class="vr-chart-grid">
+
+                <!-- Most Used -->
+                <div class="vr-card">
+                    <div class="vr-card-accent"></div>
+                    <div class="vr-card-hd">
+                        <div class="vr-card-hd-left">
+                            <div class="vr-card-title">Most used vehicles</div>
+                            <div class="vr-card-sub">Trips completed — @(Model.Period == "week" ? "this week" : "this month")</div>
+                        </div>
+                    </div>
+                    <div class="vr-card-bd">
+                        <div style="position:relative;height:220px;">
+                            <canvas id="usedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Most Available -->
+                <div class="vr-card">
+                    <div class="vr-card-accent" style="background:linear-gradient(90deg,#17a34a,#2251a3)"></div>
+                    <div class="vr-card-hd">
+                        <div class="vr-card-hd-left">
+                            <div class="vr-card-title">Most available vehicles</div>
+                            <div class="vr-card-sub">Days available — @(Model.Period == "week" ? "this week" : "this month")</div>
+                        </div>
+                    </div>
+                    <div class="vr-card-bd">
+                        <div style="position:relative;height:220px;">
+                            <canvas id="availChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Trend line chart -->
+            <div class="vr-chart-full">
+                <div class="vr-card">
+                    <div class="vr-card-accent" style="background:linear-gradient(90deg,#2251a3,#17a34a)"></div>
+                    <div class="vr-card-hd">
+                        <div class="vr-card-hd-left">
+                            <div class="vr-card-title">Usage trend — top vehicles</div>
+                            <div class="vr-card-sub">@(Model.Period == "week" ? "Day-by-day trips this week" : "Week-by-week trips this month") (top 3)</div>
+                        </div>
+                    </div>
+                    <div class="vr-card-bd">
+                        <div class="vr-legend" id="trendLegend"></div>
+                        <div style="position:relative;height:200px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status donut + Rank list -->
+            <div class="vr-chart-grid">
+
+                <!-- Status Donut -->
+                <div class="vr-card">
+                    <div class="vr-card-accent" style="background:linear-gradient(90deg,#d62839,#d97706)"></div>
+                    <div class="vr-card-hd">
+                        <div class="vr-card-hd-left">
+                            <div class="vr-card-title">Fleet status breakdown</div>
+                            <div class="vr-card-sub">Current status of all active vehicles</div>
+                        </div>
+                    </div>
+                    <div class="vr-card-bd">
+                        <div style="position:relative;height:220px;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Ranking -->
+                <div class="vr-card">
+                    <div class="vr-card-accent" style="background:linear-gradient(90deg,#d97706,#2251a3)"></div>
+                    <div class="vr-card-hd">
+                        <div class="vr-card-hd-left">
+                            <div class="vr-card-title">Usage ranking</div>
+                            <div class="vr-card-sub">Vehicles sorted by number of trips</div>
+                        </div>
+                    </div>
+                    <div class="vr-rank" id="rankList"></div>
+                </div>
+
+            </div>
+
+        </div><!-- /ab-content -->
+    </div><!-- /ab-main -->
+</div><!-- /ab-shell -->
+@section Scripts {
+    <script>
+        // ── Data from server ──────────────────────────────────────────────
+        const vehicleNames  = @Html.Raw(vehicleNamesJson);
+        const usedTrips     = @Html.Raw(usedTripsJson);
+        const availDays     = @Html.Raw(availDaysJson);
+        const trendLabels   = @Html.Raw(trendLabelsJson);
+        const trendLines    = @Html.Raw(trendLinesJson);
+
+        // ── Chart colours ─────────────────────────────────────────────────
+        const COLORS       = ['#2251a3','#d62839','#17a34a','#d97706','#7f77dd','#d4537e'];
+        const AVAIL_COLORS = ['#17a34a','#1d9e75','#2251a3','#378add','#7f77dd','#a8b0cc'];
+
+        // ── Most Used horizontal bar ──────────────────────────────────────
+        new Chart(document.getElementById('usedChart'), {
+            type: 'bar',
+            data: {
+                labels: vehicleNames,
+                datasets: [{
+                    label: 'Trips',
+                    data: usedTrips,
+                    backgroundColor: COLORS,
+                    borderRadius: 5,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => '  ' + ctx.raw + ' trips' } }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(128,128,128,0.08)' }, ticks: { font: { size: 11 } }, border: { display: false } },
+                    y: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } }, border: { display: false } }
+                }
+            }
+        });
+
+        // ── Most Available horizontal bar ─────────────────────────────────
+        new Chart(document.getElementById('availChart'), {
+            type: 'bar',
+            data: {
+                labels: vehicleNames,
+                datasets: [{
+                    label: 'Days available',
+                    data: availDays,
+                    backgroundColor: AVAIL_COLORS,
+                    borderRadius: 5,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => '  ' + ctx.raw + ' days' } }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(128,128,128,0.08)' }, ticks: { font: { size: 11 } }, border: { display: false } },
+                    y: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } }, border: { display: false } }
+                }
+            }
+        });
+
+        // ── Trend line chart ──────────────────────────────────────────────
+        const trendColors = ['#2251a3','#d62839','#17a34a'];
+        const legendEl = document.getElementById('trendLegend');
+        legendEl.innerHTML = trendLines.map((t, i) =>
+            `<div class="vr-legend-item">
+                <span class="vr-legend-dot" style="background:${trendColors[i]}"></span>
+                <span>${t.vehicleName || t.VehicleName}</span>
+            </div>`
+        ).join('');
+
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: trendLines.map((t, i) => ({
+                    label: t.vehicleName || t.VehicleName,
+                    data: t.data || t.Data,
+                    borderColor: trendColors[i],
+                    backgroundColor: trendColors[i] + '18',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: trendColors[i],
+                    borderWidth: 2.5
+                }))
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(128,128,128,0.07)' }, ticks: { font: { size: 12 } }, border: { display: false } },
+                    y: { grid: { color: 'rgba(128,128,128,0.07)' }, ticks: { font: { size: 11 }, stepSize: 1 }, border: { display: false }, beginAtZero: true }
+                }
+            }
+        });
+
+        // ── Status doughnut ───────────────────────────────────────────────
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Available', 'In use', 'Maintenance'],
+                datasets: [{
+                    data: [@Model.StatusAvailable, @Model.StatusInUse, @Model.StatusMaintenance],
+                    backgroundColor: ['#17a34a', '#2251a3', '#d62839'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '68%',
+                plugins: {
+                    legend: {
+                        display: true, position: 'bottom',
+                        labels: {
+                            font: { size: 12 },
+                            boxWidth: 12, padding: 14,
+                            usePointStyle: true, pointStyleWidth: 10
+                        }
+                    }
+                }
+            }
+        });
+
+        // ── Usage rank bars ───────────────────────────────────────────────
+        const maxTrips = Math.max(...usedTrips, 1);
+        const rankEl = document.getElementById('rankList');
+        rankEl.innerHTML = vehicleNames.map((name, i) =>
+            `<div class="vr-rank-row">
+                <div class="vr-rank-pos">${i + 1}</div>
+                <div class="vr-rank-name">${name}</div>
+                <div class="vr-rank-track">
+                    <div class="vr-rank-fill" style="width:${Math.round(usedTrips[i] / maxTrips * 100)}%;background:${COLORS[i % COLORS.length]}"></div>
+                </div>
+                <div class="vr-rank-val">${usedTrips[i]}</div>
+            </div>`
+        ).join('');
+
+        // ── Period toggle ─────────────────────────────────────────────────
+        function setPeriod(p) {
+            document.getElementById('periodInput').value = p;
+            document.getElementById('periodForm').submit();
+        }
+    </script>
+}
