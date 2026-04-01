@@ -265,6 +265,68 @@
             font-size: 14px;
             margin: 0;
         }
+    /* ── In Use vehicles ── */
+    .inuse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+        margin-bottom: 36px;
+    }
+
+    .inuse-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: box-shadow .15s;
+    }
+
+        .inuse-card:hover {
+            box-shadow: 0 4px 18px rgba(0,0,0,.06);
+        }
+
+    .vc-top-inuse {
+        background: var(--amber-bg);
+        padding: 18px 20px 14px;
+        position: relative;
+    }
+
+    .vc-type-badge-inuse {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        background: rgba(186,117,23,.15);
+        color: var(--amber);
+        padding: 3px 9px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .vc-avail-dot-inuse {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 3px rgba(186,117,23,.25);
+    }
+
+    .avail-countdown {
+        display: block;
+        margin-top: 12px;
+        padding: 8px 12px;
+        background: var(--amber-bg);
+        border: 1px solid #f0c97a;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--amber);
+        text-align: center;
+    }
 
     /* ── My Requests table ── */
     .req-table-wrap {
@@ -602,6 +664,69 @@
             }
         </div>
     }
+    @* ── In Use Vehicles ── *@
+    <div class="section-title">🔑 In Use (@Model.InUseVehicles.Count)</div>
+
+    @if (!Model.InUseVehicles.Any())
+    {
+        <div class="empty-state">
+            <div class="ei">✅</div>
+            <p>No vehicles are currently in use.</p>
+        </div>
+    }
+    else
+    {
+        <div class="inuse-grid">
+            @foreach (var v in Model.InUseVehicles)
+            {
+                var remaining = v.EndTime - DateTime.Now;
+                string countdownText;
+                string countdownStyle = "";
+
+                if (remaining.TotalMinutes <= 0)
+                {
+                    countdownText = "⚠️ Overdue — should have returned by " + v.EndTime.ToString("hh:mm tt");
+                    countdownStyle = "background:#fcebeb; border-color:#f7c1c1; color:#a32d2d;";
+                }
+                else if (remaining.TotalMinutes < 60)
+                {
+                    countdownText = $"⏳ Available in ~{(int)remaining.TotalMinutes} min";
+                }
+                else if (remaining.TotalHours < 24)
+                {
+                    countdownText = $"⏳ Available at {v.EndTime:hh:mm tt} today";
+                }
+                else
+                {
+                    countdownText = $"⏳ Available on {v.EndTime:dd MMM} at {v.EndTime:hh:mm tt}";
+                }
+
+                <div class="inuse-card">
+                    <div class="vc-top-inuse">
+                        <div class="vc-avail-dot-inuse"></div>
+                        <div class="vc-type-badge-inuse">@v.VehicleType</div>
+                        <div class="vc-name">@v.VehicleName</div>
+                        <div class="vc-reg">@v.RegistrationNumber</div>
+                    </div>
+                    <div class="vc-body">
+                        <div class="vc-detail">
+                            <span>In use by</span>
+                            <strong>@v.UserName</strong>
+                        </div>
+                        <div class="vc-detail">
+                            <span>Emp No</span>
+                            <strong>@v.EmployeeNumber</strong>
+                        </div>
+                        <div class="vc-detail">
+                            <span>Due back</span>
+                            <strong style="font-size:11px;">@v.EndTime.ToString("dd MMM, hh:mm tt")</strong>
+                        </div>
+                        <span class="avail-countdown" style="@countdownStyle">@countdownText</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 
     @* ── My Requests ── *@
     <div class="section-title">📋 My Requests (@Model.MyRequests.Count)</div>
@@ -627,7 +752,8 @@
                         <th>Duration</th>
                         <th>Purpose</th>
                         <th>Status</th>
-                        <th>Action</th>   @* ← new column *@
+                        <th>Admin Notes</th>
+                        <th>Action</th>  
                     </tr>
                 </thead>
                 <tbody>
@@ -660,6 +786,24 @@
                                 @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
                             </td>
                             <td><span class="status-badge @sbClass">@r.Status</span></td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(r.AdminNotes))
+                                {
+                                    string noteClass = (r.Status == "Approved" || r.Status == "Completed")
+                                    ? "color: var(--green); background: var(--green-bg); border: 1px solid #9fe1cb;"
+                                    : "color: var(--red); background: var(--red-bg); border: 1px solid #f7c1c1;";
+
+                                    <span style="display:inline-block; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; vertical-align:middle; @noteClass"
+                                          title="@r.AdminNotes">
+                                        💬 @r.AdminNotes
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="font-size:11px; color:#ccc;">—</span>
+                                }
+                            </td>
 
                             @* ── Action column ── *@
                             <td>

@@ -9,12 +9,14 @@
     :root {
         --green: #1d9e75;
         --green-bg: #e1f5ee;
+        --green-mid: #9fe1cb;
         --blue: #185fa5;
         --blue-bg: #e6f1fb;
         --amber: #ba7517;
         --amber-bg: #faeeda;
         --red: #a32d2d;
         --red-bg: #fcebeb;
+        --red-mid: #f7c1c1;
         --gray-bg: #f9f8f4;
         --border: #e8e6de;
         --text: #2c2c2a;
@@ -49,7 +51,7 @@
         }
 
     .rs-total::before {
-        background: #888780;
+        background: var(--muted);
     }
 
     .rs-pending::before {
@@ -68,7 +70,7 @@
         background: var(--blue);
     }
 
-    .req-stat .rs-label {
+    .rs-label {
         font-size: 10.5px;
         font-weight: 700;
         letter-spacing: .07em;
@@ -77,7 +79,7 @@
         margin-bottom: 8px;
     }
 
-    .req-stat .rs-num {
+    .rs-num {
         font-size: 32px;
         font-weight: 700;
         font-family: Georgia, serif;
@@ -124,12 +126,7 @@
         white-space: nowrap;
     }
 
-        .filter-btn:hover {
-            border-color: var(--blue);
-            color: var(--blue);
-            background: var(--blue-bg);
-        }
-
+        .filter-btn:hover,
         .filter-btn.active {
             border-color: var(--blue);
             color: var(--blue);
@@ -160,7 +157,7 @@
             background: var(--blue-bg);
         }
 
-    /* ── Table card ── */
+    /* ── Table ── */
     .req-table-card {
         background: #fff;
         border: 1px solid var(--border);
@@ -340,14 +337,38 @@
         flex-wrap: wrap;
     }
 
-    /* Duration chip */
     .dur-chip {
         font-weight: 700;
         font-size: 12px;
         color: var(--blue);
     }
 
-    /* Empty */
+    /* Admin notes pill */
+    .admin-note-pill {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: default;
+        vertical-align: middle;
+    }
+
+    .note-approved {
+        background: var(--green-bg);
+        color: var(--green);
+    }
+
+    .note-rejected {
+        background: var(--red-bg);
+        color: var(--red);
+    }
+
+    /* Empty / Flash */
     .req-empty {
         text-align: center;
         padding: 52px 24px;
@@ -359,11 +380,10 @@
             margin-bottom: 10px;
         }
 
-    /* Flash */
     .flash-ok {
         background: var(--green-bg);
         color: var(--green);
-        border: 1px solid #9fe1cb;
+        border: 1px solid var(--green-mid);
         border-radius: 10px;
         padding: 12px 18px;
         margin-bottom: 18px;
@@ -377,7 +397,7 @@
     .flash-err {
         background: var(--red-bg);
         color: var(--red);
-        border: 1px solid #f7c1c1;
+        border: 1px solid var(--red-mid);
         border-radius: 10px;
         padding: 12px 18px;
         margin-bottom: 18px;
@@ -387,6 +407,212 @@
         align-items: center;
         gap: 8px;
     }
+
+    /* ── Modal ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(44,44,42,.5);
+        backdrop-filter: blur(3px);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal-box {
+        background: #fff;
+        border-radius: var(--radius);
+        width: 100%;
+        max-width: 440px;
+        margin: 16px;
+        overflow: hidden;
+        animation: modalIn .22s cubic-bezier(.34,1.4,.64,1);
+        box-shadow: 0 16px 48px rgba(0,0,0,.14);
+    }
+
+    @@keyframes modalIn {
+        from {
+            transform: scale(.94) translateY(12px);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-hd {
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .modal-hd h5 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .modal-hd.hd-approve {
+            background: var(--green-bg);
+            border-color: var(--green-mid);
+        }
+
+        .modal-hd.hd-reject {
+            background: var(--red-bg);
+            border-color: var(--red-mid);
+        }
+
+    .modal-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s;
+    }
+
+        .modal-close:hover {
+            background: var(--border);
+        }
+
+    .modal-bd {
+        padding: 22px;
+    }
+
+    .modal-req-info {
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 18px;
+    }
+
+    .mri-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .mri-meta {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .notes-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+        .notes-label span {
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+    .notes-textarea {
+        width: 100%;
+        padding: 10px 13px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--text);
+        background: #fff;
+        box-sizing: border-box;
+        outline: none;
+        resize: vertical;
+        font-family: 'Segoe UI', sans-serif;
+        transition: border-color .15s;
+        min-height: 88px;
+    }
+
+        .notes-textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(29,158,117,.1);
+        }
+
+        .notes-textarea.reject:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(163,45,45,.1);
+        }
+
+    .notes-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 5px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 10px;
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: 'Segoe UI', sans-serif;
+        transition: background .15s;
+    }
+
+        .btn-cancel:hover {
+            background: var(--border);
+        }
+
+    .btn-confirm {
+        flex: 2;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'Segoe UI', sans-serif;
+        transition: opacity .15s, transform .1s;
+    }
+
+        .btn-confirm:hover {
+            opacity: .88;
+            transform: translateY(-1px);
+        }
+
+        .btn-confirm.confirm-approve {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-confirm.confirm-reject {
+            background: var(--red);
+            color: #fff;
+        }
 </style>
 
 <div class="ab-shell">
@@ -400,7 +626,6 @@
                 <div class="page-sub">Review, approve or reject user vehicle requests.</div>
             </div>
 
-            @* Flash messages *@
             @if (TempData["Success"] != null)
             {
                 <div class="flash-ok">✅ @TempData["Success"]</div>
@@ -410,34 +635,18 @@
                 <div class="flash-err">⚠️ @TempData["Error"]</div>
             }
 
-            @* ── Summary strip ── *@
+            @* Summary *@
             <div class="req-summary">
-                <div class="req-stat rs-total">
-                    <div class="rs-label">Total</div>
-                    <div class="rs-num">@Model.TotalCount</div>
-                </div>
-                <div class="req-stat rs-pending">
-                    <div class="rs-label">Pending</div>
-                    <div class="rs-num">@Model.PendingCount</div>
-                </div>
-                <div class="req-stat rs-approved">
-                    <div class="rs-label">Approved</div>
-                    <div class="rs-num">@Model.ApprovedCount</div>
-                </div>
-                <div class="req-stat rs-rejected">
-                    <div class="rs-label">Rejected</div>
-                    <div class="rs-num">@Model.RejectedCount</div>
-                </div>
-                <div class="req-stat rs-completed">
-                    <div class="rs-label">Completed</div>
-                    <div class="rs-num">@Model.CompletedCount</div>
-                </div>
+                <div class="req-stat rs-total">    <div class="rs-label">Total</div>     <div class="rs-num">@Model.TotalCount</div>     </div>
+                <div class="req-stat rs-pending">  <div class="rs-label">Pending</div>   <div class="rs-num">@Model.PendingCount</div>   </div>
+                <div class="req-stat rs-approved"> <div class="rs-label">Approved</div>  <div class="rs-num">@Model.ApprovedCount</div>  </div>
+                <div class="req-stat rs-rejected"> <div class="rs-label">Rejected</div>  <div class="rs-num">@Model.RejectedCount</div>  </div>
+                <div class="req-stat rs-completed"><div class="rs-label">Completed</div> <div class="rs-num">@Model.CompletedCount</div> </div>
             </div>
 
-            @* ── Filter bar ── *@
+            @* Filter bar *@
             <div class="filter-bar">
-                <input class="filter-search" id="reqSearch" type="text"
-                       placeholder="🔍  Search by name, vehicle, emp no, reg…" />
+                <input class="filter-search" id="reqSearch" type="text" placeholder="🔍  Search by name, vehicle, emp no, reg…" />
                 <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
                 <button class="filter-btn f-pending" onclick="setFilter('pending',this)">Pending</button>
                 <button class="filter-btn f-approved" onclick="setFilter('approved',this)">Approved</button>
@@ -445,20 +654,17 @@
                 <button class="filter-btn f-completed" onclick="setFilter('completed',this)">Completed</button>
             </div>
 
-            @* ── Table ── *@
+            @* Table *@
             @if (!Model.AllRequests.Any())
             {
                 <div class="req-table-card">
-                    <div class="req-empty">
-                        <div class="ei">📭</div>
-                        <p>No vehicle requests have been submitted yet.</p>
-                    </div>
+                    <div class="req-empty"><div class="ei">📭</div><p>No vehicle requests have been submitted yet.</p></div>
                 </div>
             }
             else
             {
                 <div class="req-table-card">
-                    <div style="overflow-x: auto;">
+                    <div style="overflow-x:auto;">
                         <table class="req-table" id="reqTable">
                             <thead>
                                 <tr>
@@ -472,6 +678,7 @@
                                     <th>Purpose</th>
                                     <th>Requested On</th>
                                     <th>Status</th>
+                                    <th>Admin Notes</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -482,10 +689,8 @@
                                 @foreach (var r in Model.AllRequests)
                                 {
                                     double hrs = (r.EndTime - r.StartTime).TotalHours;
-                                    string dur = hrs >= 24
-                                    ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
-                                    : hrs >= 1
-                                    ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
+                                    string dur = hrs >= 24 ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
+                                    : hrs >= 1 ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
                                     : $"{(int)(hrs * 60)}m";
 
                                     string sbClass = r.Status.ToLower() switch
@@ -501,11 +706,15 @@
                                     .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                     .Take(2).Select(w => w[0])).ToUpper();
 
+                                    string jsName = r.VehicleName.Replace("'", "\\'");
+                                    string jsUser = r.UserName.Replace("'", "\\'");
+                                    string jsEmp = r.EmployeeNumber.Replace("'", "\\'");
+
                                     <tr class="req-row"
                                         data-status="@r.Status.ToLower()"
                                         data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower()">
 
-                                        <td style="color:#b4b2a9; font-size:11px;">@i</td>
+                                        <td style="color:#b4b2a9;font-size:11px;">@i</td>
 
                                         <td>
                                             <div class="user-cell">
@@ -517,44 +726,59 @@
                                             </div>
                                         </td>
 
-                                        <td style="font-weight: 600;">@r.VehicleName</td>
-
+                                        <td style="font-weight:600;">@r.VehicleName</td>
                                         <td><span class="reg-mono">@r.RegistrationNumber</span></td>
 
-                                        <td style="font-size:12px; white-space:nowrap;">
+                                        <td style="font-size:12px;white-space:nowrap;">
                                             @r.StartTime.ToString("dd MMM yy")<br />
                                             <span style="color:var(--muted)">@r.StartTime.ToString("hh:mm tt")</span>
                                         </td>
-
-                                        <td style="font-size:12px; white-space:nowrap;">
+                                        <td style="font-size:12px;white-space:nowrap;">
                                             @r.EndTime.ToString("dd MMM yy")<br />
                                             <span style="color:var(--muted)">@r.EndTime.ToString("hh:mm tt")</span>
                                         </td>
 
                                         <td><span class="dur-chip">@dur</span></td>
 
-                                        <td style="color:var(--muted); font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        <td style="color:var(--muted);font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                                             @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
                                         </td>
 
-                                        <td style="font-size:11px; color:var(--muted); white-space:nowrap;">
+                                        <td style="font-size:11px;color:var(--muted);white-space:nowrap;">
                                             @r.CreatedAt.ToString("dd MMM yy, hh:mm tt")
                                         </td>
 
                                         <td><span class="sbadge @sbClass">@r.Status</span></td>
 
+                                        @* ── Admin Notes ── *@
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(r.AdminNotes))
+                                            {
+                                                string noteClass = (r.Status == "Approved" || r.Status == "Completed")
+                                                ? "note-approved" : "note-rejected";
+                                                <span class="admin-note-pill @noteClass" title="@r.AdminNotes">
+                                                    💬 @r.AdminNotes
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-size:11px;color:#ccc;">—</span>
+                                            }
+                                        </td>
+
+                                        @* ── Actions ── *@
                                         <td>
                                             <div class="act-group">
                                                 @if (r.Status == "Pending")
                                                 {
-                                                    <form asp-action="ApproveRequest" asp-controller="Autobase" method="post" style="display:inline;">
-                                                        <input type="hidden" name="id" value="@r.Id" />
-                                                        <button type="submit" class="act-btn btn-approve">✔ Approve</button>
-                                                    </form>
-                                                    <form asp-action="RejectRequest" asp-controller="Autobase" method="post" style="display:inline;">
-                                                        <input type="hidden" name="id" value="@r.Id" />
-                                                        <button type="submit" class="act-btn btn-reject">✘ Reject</button>
-                                                    </form>
+                                                    <button type="button" class="act-btn btn-approve"
+                                                            onclick="openApprove(@r.Id,'@jsUser','@jsEmp','@jsName')">
+                                                        ✔ Approve
+                                                    </button>
+                                                    <button type="button" class="act-btn btn-reject"
+                                                            onclick="openReject(@r.Id,'@jsUser','@jsEmp','@jsName')">
+                                                        ✘ Reject
+                                                    </button>
                                                 }
                                                 else if (r.Status == "Approved")
                                                 {
@@ -565,7 +789,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <span style="font-size:11px; color:var(--muted);">No actions</span>
+                                                    <span style="font-size:11px;color:var(--muted);">—</span>
                                                 }
                                             </div>
                                         </td>
@@ -582,8 +806,63 @@
     </div>
 </div>
 
+@* ── Approve Modal ── *@
+<div class="modal-overlay" id="approveModal">
+    <div class="modal-box">
+        <div class="modal-hd hd-approve">
+            <h5>✔ Approve Request</h5>
+            <button class="modal-close" onclick="closeModals()">✕</button>
+        </div>
+        <div class="modal-bd">
+            <div class="modal-req-info">
+                <div class="mri-name" id="ap-vehicle">—</div>
+                <div class="mri-meta" id="ap-user">—</div>
+            </div>
+            <form asp-action="ApproveRequest" asp-controller="Autobase" method="post">
+                <input type="hidden" name="Id" id="ap-id" />
+                <label class="notes-label">Approval Notes <span>(optional)</span></label>
+                <textarea class="notes-textarea" name="Notes" id="ap-notes"
+                          placeholder="e.g. Approved for official use. Please return by end of day."></textarea>
+                <p class="notes-hint">These notes will be visible to the employee in their request history.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
+                    <button type="submit" class="btn-confirm confirm-approve">✔ Confirm Approval</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ── Reject Modal ── *@
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal-box">
+        <div class="modal-hd hd-reject">
+            <h5>✘ Reject Request</h5>
+            <button class="modal-close" onclick="closeModals()">✕</button>
+        </div>
+        <div class="modal-bd">
+            <div class="modal-req-info">
+                <div class="mri-name" id="rj-vehicle">—</div>
+                <div class="mri-meta" id="rj-user">—</div>
+            </div>
+            <form asp-action="RejectRequest" asp-controller="Autobase" method="post">
+                <input type="hidden" name="Id" id="rj-id" />
+                <label class="notes-label">Reason for Rejection <span>(recommended)</span></label>
+                <textarea class="notes-textarea reject" name="Notes" id="rj-notes"
+                          placeholder="e.g. Vehicle already booked. Please try a different date or time."></textarea>
+                <p class="notes-hint">The employee will see this reason alongside their rejected request.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
+                    <button type="submit" class="btn-confirm confirm-reject">✘ Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        /* ── Filter / Search ── */
         let activeFilter = 'all';
 
         function setFilter(status, btn) {
@@ -598,10 +877,38 @@
         function applyFilters() {
             const q = document.getElementById('reqSearch').value.toLowerCase().trim();
             document.querySelectorAll('.req-row').forEach(row => {
-                const statusOk  = activeFilter === 'all' || row.dataset.status === activeFilter;
-                const searchOk  = !q || row.dataset.search.includes(q);
+                const statusOk = activeFilter === 'all' || row.dataset.status === activeFilter;
+                const searchOk = !q || row.dataset.search.includes(q);
                 row.style.display = statusOk && searchOk ? '' : 'none';
             });
         }
+
+        /* ── Modals ── */
+        function openApprove(id, userName, empNo, vehicleName) {
+            document.getElementById('ap-id').value = id;
+            document.getElementById('ap-vehicle').textContent = vehicleName;
+            document.getElementById('ap-user').textContent    = userName + '  ·  ' + empNo;
+            document.getElementById('ap-notes').value = '';
+            document.getElementById('approveModal').classList.add('open');
+        }
+
+        function openReject(id, userName, empNo, vehicleName) {
+            document.getElementById('rj-id').value = id;
+            document.getElementById('rj-vehicle').textContent = vehicleName;
+            document.getElementById('rj-user').textContent    = userName + '  ·  ' + empNo;
+            document.getElementById('rj-notes').value = '';
+            document.getElementById('rejectModal').classList.add('open');
+        }
+
+        function closeModals() {
+            document.getElementById('approveModal').classList.remove('open');
+            document.getElementById('rejectModal').classList.remove('open');
+        }
+
+        ['approveModal', 'rejectModal'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function(e) {
+                if (e.target === this) closeModals();
+            });
+        });
     </script>
 }

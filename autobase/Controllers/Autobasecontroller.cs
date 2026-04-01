@@ -80,21 +80,21 @@ namespace autobase.Controllers
 
         // ── POST: Approve Request ──
         [HttpPost]
-        public IActionResult ApproveRequest(int id)
+        public IActionResult ApproveRequest(RequestActionViewModel model)
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var request = _db.VehicleRequests.Find(id);
+            var request = _db.VehicleRequests.Find(model.Id);
             if (request == null)
             {
                 TempData["Error"] = "Request not found.";
                 return RedirectToAction("SeeRequest");
             }
 
-            // Mark request approved
             request.Status = "Approved";
+            request.AdminNotes = string.IsNullOrWhiteSpace(model.Notes)
+                                 ? null : model.Notes.Trim();
 
-            // Mark vehicle as In Use
             var vehicle = _db.Vehicles.Find(request.VehicleId);
             if (vehicle != null) vehicle.Status = "In Use";
 
@@ -105,11 +105,11 @@ namespace autobase.Controllers
 
         // ── POST: Reject Request ──
         [HttpPost]
-        public IActionResult RejectRequest(int id)
+        public IActionResult RejectRequest(RequestActionViewModel model)
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var request = _db.VehicleRequests.Find(id);
+            var request = _db.VehicleRequests.Find(model.Id);
             if (request == null)
             {
                 TempData["Error"] = "Request not found.";
@@ -117,8 +117,10 @@ namespace autobase.Controllers
             }
 
             request.Status = "Rejected";
-            _db.SaveChanges();
+            request.AdminNotes = string.IsNullOrWhiteSpace(model.Notes)
+                                 ? null : model.Notes.Trim();
 
+            _db.SaveChanges();
             TempData["Error"] = $"Request by {request.UserName} for {request.VehicleName} has been rejected.";
             return RedirectToAction("SeeRequest");
         }
