@@ -85,10 +85,12 @@ namespace autobase.Controllers
             HttpContext.Session.SetString("UserRole", user.Role);
 
             // Role-based redirect
-            if (user.Role == "Admin")
-                return RedirectToAction("AdminDashboard", "Home");
-            else
-                return RedirectToAction("Dashboard", "Home");
+            return user.Role switch
+            {
+                "SuperAdmin" => RedirectToAction("AdminDashboard", "Home"),
+                "Admin" => RedirectToAction("AdminDashboard", "Home"),
+                _ => RedirectToAction("Dashboard", "Home")
+            };
         }
 
         // ─── LOGOUT ─────────────────────────────────────────────

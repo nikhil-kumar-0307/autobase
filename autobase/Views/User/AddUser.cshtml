@@ -401,8 +401,10 @@
                             <span>Assign Role <span style="color:var(--danger);margin-left:2px;">*</span></span>
                         </div>
                         <div class="form-card-body">
-                            <div class="role-grid">
+                        <div class="role-grid">
 
+                            @if (Context.Session.GetString("UserRole") == "SuperAdmin")
+                            {
                                 <div>
                                     <input type="radio" asp-for="Role" value="Admin" id="rAdmin" class="role-radio" />
                                     <label for="rAdmin" class="role-label">
@@ -411,17 +413,18 @@
                                         <span class="role-desc">Full system access</span>
                                     </label>
                                 </div>
+                            }
 
-                                <div>
-                                    <input type="radio" asp-for="Role" value="Employee" id="rEmployee" class="role-radio" />
-                                    <label for="rEmployee" class="role-label">
-                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                                        <span class="role-name">Employee</span>
-                                        <span class="role-desc">Can request vehicles</span>
-                                    </label>
-                                </div>
-
+                            <div>
+                                <input type="radio" asp-for="Role" value="Employee" id="rEmployee" class="role-radio" />
+                                <label for="rEmployee" class="role-label">
+                                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                    <span class="role-name">Employee</span>
+                                    <span class="role-desc">Can request vehicles</span>
+                                </label>
                             </div>
+
+                        </div>
                             <span asp-validation-for="Role" class="field-error" style="display:block;margin-top:10px;"></span>
                         </div>
                     </div>

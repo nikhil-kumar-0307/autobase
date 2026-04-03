@@ -24,8 +24,9 @@ namespace autobase.Controllers
 
         private bool IsAdminLoggedIn()
         {
+            var role = HttpContext.Session.GetString("UserRole");
             return !string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"))
-                   && HttpContext.Session.GetString("UserRole") == "Admin";
+                   && (role == "Admin" || role == "SuperAdmin");
         }
 
         // ── GET: /Autobase/AllocatedVehicle ──
@@ -79,21 +80,21 @@ namespace autobase.Controllers
 
         // ── POST: Approve Request ──
         [HttpPost]
-        public IActionResult ApproveRequest(int id)
+        public IActionResult ApproveRequest(RequestActionViewModel model)
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var request = _db.VehicleRequests.Find(id);
+            var request = _db.VehicleRequests.Find(model.Id);
             if (request == null)
             {
                 TempData["Error"] = "Request not found.";
                 return RedirectToAction("SeeRequest");
             }
 
-            // Mark request approved
             request.Status = "Approved";
+            request.AdminNotes = string.IsNullOrWhiteSpace(model.Notes)
+                                 ? null : model.Notes.Trim();
 
-            // Mark vehicle as In Use
             var vehicle = _db.Vehicles.Find(request.VehicleId);
             if (vehicle != null) vehicle.Status = "In Use";
 
@@ -104,11 +105,11 @@ namespace autobase.Controllers
 
         // ── POST: Reject Request ──
         [HttpPost]
-        public IActionResult RejectRequest(int id)
+        public IActionResult RejectRequest(RequestActionViewModel model)
         {
             if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var request = _db.VehicleRequests.Find(id);
+            var request = _db.VehicleRequests.Find(model.Id);
             if (request == null)
             {
                 TempData["Error"] = "Request not found.";
@@ -116,8 +117,10 @@ namespace autobase.Controllers
             }
 
             request.Status = "Rejected";
-            _db.SaveChanges();
+            request.AdminNotes = string.IsNullOrWhiteSpace(model.Notes)
+                                 ? null : model.Notes.Trim();
 
+            _db.SaveChanges();
             TempData["Error"] = $"Request by {request.UserName} for {request.VehicleName} has been rejected.";
             return RedirectToAction("SeeRequest");
         }
@@ -180,6 +183,104 @@ namespace autobase.Controllers
                 TotalAvailable = vehicles.Count(v => v.Status == "Available"),
                 TotalInUse = vehicles.Count(v => v.Status == "In Use"),
                 TotalMaintenance = vehicles.Count(v => v.Status == "Maintenance")
+            };
+
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult VehicleReport(string period = "week")
+        {
+            if (!IsAdminLoggedIn()) return RedirectToAction("Login", "Account");
+            SetUserViewBag();
+
+            var now = DateTime.Now;
+            DateTime from = period == "month"
+                ? new DateTime(now.Year, now.Month, 1)
+                : now.StartOfWeek(DayOfWeek.Monday); // extension below
+
+            var requests = _db.VehicleRequests
+                .Where(r => r.CreatedAt >= from && r.CreatedAt <= now
+                         && (r.Status == "Approved" || r.Status == "Completed"))
+                .ToList();
+
+            // Most used — group by vehicle name, count trips
+            var usageGroups = requests
+                .GroupBy(r => r.VehicleName)
+                .Select(g => new { Name = g.Key, Trips = g.Count() })
+                .OrderByDescending(g => g.Trips)
+                .Take(6).ToList();
+
+            // Availability — total days in period minus days in use per vehicle
+            int totalDays = (now - from).Days + 1;
+            var allVehicles = _db.Vehicles.Where(v => v.IsActive).ToList();
+            var availGroups = allVehicles
+                .Select(v => new {
+                    v.VehicleName,
+                    DaysInUse = requests.Count(r => r.VehicleName == v.VehicleName),
+                    AvailDays = Math.Max(0, totalDays - requests.Count(r => r.VehicleName == v.VehicleName))
+                })
+                .OrderByDescending(v => v.AvailDays)
+                .Take(6).ToList();
+
+            // Trend labels + per-vehicle data
+            List<string> trendLabels;
+            List<VehicleTrendLine> trendLines = new();
+            var top3 = usageGroups.Take(3).Select(g => g.Name).ToList();
+
+            if (period == "week")
+            {
+                trendLabels = Enumerable.Range(0, 7)
+                    .Select(i => from.AddDays(i).ToString("ddd")).ToList();
+                foreach (var name in top3)
+                {
+                    trendLines.Add(new VehicleTrendLine
+                    {
+                        VehicleName = name,
+                        Data = Enumerable.Range(0, 7).Select(i => {
+                            var day = from.AddDays(i);
+                            return requests.Count(r => r.VehicleName == name
+                                && r.CreatedAt.Date == day.Date);
+                        }).ToList()
+                    });
+                }
+            }
+            else
+            {
+                trendLabels = Enumerable.Range(0, 4).Select(i => "Wk " + (i + 1)).ToList();
+                foreach (var name in top3)
+                {
+                    trendLines.Add(new VehicleTrendLine
+                    {
+                        VehicleName = name,
+                        Data = Enumerable.Range(0, 4).Select(i => {
+                            var wkStart = from.AddDays(i * 7);
+                            var wkEnd = wkStart.AddDays(7);
+                            return requests.Count(r => r.VehicleName == name
+                                && r.CreatedAt >= wkStart && r.CreatedAt < wkEnd);
+                        }).ToList()
+                    });
+                }
+            }
+
+            var vehicles = _db.Vehicles.Where(v => v.IsActive).ToList();
+            var model = new VehicleReportViewModel
+            {
+                Period = period,
+                TotalRequests = requests.Count,
+                MostUsedVehicle = usageGroups.FirstOrDefault()?.Name ?? "—",
+                MostUsedTrips = usageGroups.FirstOrDefault()?.Trips ?? 0,
+                MostAvailableVehicle = availGroups.FirstOrDefault()?.VehicleName ?? "—",
+                MostAvailableDays = availGroups.FirstOrDefault()?.AvailDays ?? 0,
+                UtilisationPercent = vehicles.Count == 0 ? 0
+                    : (int)Math.Round(requests.Select(r => r.VehicleName).Distinct().Count() * 100.0 / vehicles.Count),
+                VehicleNames = usageGroups.Select(g => g.Name).ToList(),
+                UsedTrips = usageGroups.Select(g => g.Trips).ToList(),
+                AvailableDays = availGroups.Select(g => g.AvailDays).ToList(),
+                TrendLabels = trendLabels,
+                TrendLines = trendLines,
+                StatusAvailable = vehicles.Count(v => v.Status == "Available"),
+                StatusInUse = vehicles.Count(v => v.Status == "In Use"),
+                StatusMaintenance = vehicles.Count(v => v.Status == "Maintenance")
             };
 
             return View(model);
