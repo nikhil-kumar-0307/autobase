@@ -875,6 +875,7 @@ function showSelectedVehicle() {
 /* ── Request modal (normal) ── */
 function openModal(id, name, reg, type) {
     document.getElementById('modalTitle').textContent = '🚗 Request Vehicle';
+    document.getElementById('modalVehicleId').value         = id;
     document.getElementById('modalVehicleName').textContent = name;
     document.getElementById('modalVehicleReg').textContent  = reg;
     document.getElementById('modalVehicleType').textContent = type;

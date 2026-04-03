@@ -4,256 +4,484 @@
     Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
 }
 <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
     :root {
-        --green: #1d9e75;
-        --green-bg: #e1f5ee;
-        --green-mid: #9fe1cb;
-        --blue: #185fa5;
-        --blue-bg: #e6f1fb;
-        --amber: #ba7517;
-        --amber-bg: #faeeda;
-        --red: #a32d2d;
-        --red-bg: #fcebeb;
-        --red-mid: #f7c1c1;
-        --gray-bg: #f9f8f4;
-        --border: #e8e6de;
-        --text: #2c2c2a;
-        --muted: #888780;
-        --radius: 14px;
+        --green: #16a37a;
+        --green-light: #edfaf4;
+        --green-mid: #a7e8d2;
+        --blue: #2563a8;
+        --blue-light: #eff6ff;
+        --amber: #c47d10;
+        --amber-light: #fff8ec;
+        --amber-mid: #fcd97a;
+        --red: #b83535;
+        --red-light: #fff1f1;
+        --red-mid: #f5bfbf;
+        --gray-bg: #f7f6f2;
+        --border: #ebebeb;
+        --border-dark: #d8d6d0;
+        --text: #1e1e1c;
+        --text-2: #5a5956;
+        --text-3: #9a9894;
+        --white: #ffffff;
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+        --shadow: 0 4px 12px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.04);
+        --font: 'DM Sans', sans-serif;
+        --font-mono: 'DM Mono', monospace;
     }
 
-    /* ── Summary strip ── */
-    .req-summary {
+    * {
+        font-family: var(--font);
+        box-sizing: border-box;
+    }
+
+    /* ── Page header ── */
+    .sr-page-header {
+        margin-bottom: 28px;
+    }
+
+        .sr-page-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 4px;
+            letter-spacing: -.3px;
+        }
+
+        .sr-page-header p {
+            font-size: 13.5px;
+            color: var(--text-3);
+            margin: 0;
+        }
+
+    /* ── Flash ── */
+    .flash {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 16px;
+        border-radius: var(--radius);
+        font-size: 13.5px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+    }
+
+    .flash-ok {
+        background: var(--green-light);
+        color: #0e7a5c;
+        border-color: var(--green-mid);
+    }
+
+    .flash-err {
+        background: var(--red-light);
+        color: var(--red);
+        border-color: var(--red-mid);
+    }
+
+    /* ── Summary cards ── */
+    .sr-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 14px;
-        margin-bottom: 26px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    @@media (max-width: 900px) {
+        .sr-stats
+
+    {
+        grid-template-columns: repeat(3, 1fr);
     }
 
-    .req-stat {
-        background: #fff;
+    }
+
+    .stat-card {
+        background: var(--white);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 16px 18px;
+        padding: 18px 20px;
         position: relative;
         overflow: hidden;
+        transition: box-shadow .15s;
+        cursor: pointer;
     }
 
-        .req-stat::before {
+        .stat-card:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
             height: 3px;
+            border-radius: 0 0 var(--radius) var(--radius);
         }
 
-    .rs-total::before {
-        background: var(--muted);
+    .stat-total::after {
+        background: var(--border-dark);
     }
 
-    .rs-pending::before {
+    .stat-pending::after {
         background: var(--amber);
     }
 
-    .rs-approved::before {
+    .stat-approved::after {
         background: var(--green);
     }
 
-    .rs-rejected::before {
+    .stat-rejected::after {
         background: var(--red);
     }
 
-    .rs-completed::before {
+    .stat-completed::after {
         background: var(--blue);
     }
 
-    .rs-label {
-        font-size: 10.5px;
-        font-weight: 700;
-        letter-spacing: .07em;
+    .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .06em;
         text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 8px;
+        color: var(--text-3);
+        margin-bottom: 10px;
     }
 
-    .rs-num {
-        font-size: 32px;
+    .stat-value {
+        font-size: 36px;
         font-weight: 700;
-        font-family: Georgia, serif;
-        color: var(--text);
         line-height: 1;
+        color: var(--text);
+        letter-spacing: -1px;
     }
 
-    /* ── Filter bar ── */
-    .filter-bar {
+    .stat-total .stat-value {
+        color: var(--text);
+    }
+
+    .stat-pending .stat-value {
+        color: var(--amber);
+    }
+
+    .stat-approved .stat-value {
+        color: var(--green);
+    }
+
+    .stat-rejected .stat-value {
+        color: var(--red);
+    }
+
+    .stat-completed .stat-value {
+        color: var(--blue);
+    }
+
+    /* ── Toolbar ── */
+    .sr-toolbar {
         display: flex;
-        gap: 10px;
         align-items: center;
-        margin-bottom: 20px;
+        gap: 10px;
+        margin-bottom: 16px;
         flex-wrap: wrap;
     }
 
-    .filter-search {
+    .sr-search-wrap {
         flex: 1;
-        min-width: 220px;
-        padding: 9px 14px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        background: #fff;
-        color: var(--text);
-        outline: none;
-        transition: border-color .2s;
+        min-width: 240px;
+        position: relative;
     }
 
-        .filter-search:focus {
-            border-color: var(--blue);
+    .sr-search-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-3);
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+    .sr-search {
+        width: 100%;
+        padding: 10px 14px 10px 38px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        color: var(--text);
+        background: var(--white);
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+        font-family: var(--font);
+    }
+
+        .sr-search:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37,99,168,.08);
         }
 
-    .filter-btn {
-        padding: 8px 15px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: #fff;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--muted);
+        .sr-search::placeholder {
+            color: var(--text-3);
+        }
+
+    .filter-pills {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .fp {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 1.5px solid var(--border);
+        background: var(--white);
+        color: var(--text-2);
         cursor: pointer;
         transition: all .15s;
         white-space: nowrap;
     }
 
-        .filter-btn:hover,
-        .filter-btn.active {
-            border-color: var(--blue);
-            color: var(--blue);
-            background: var(--blue-bg);
+        .fp:hover {
+            border-color: var(--border-dark);
+            color: var(--text);
         }
 
-        .filter-btn.f-pending.active {
-            border-color: var(--amber);
+        .fp.active-all {
+            background: var(--text);
+            color: var(--white);
+            border-color: var(--text);
+        }
+
+        .fp.active-pending {
+            background: var(--amber-light);
             color: var(--amber);
-            background: var(--amber-bg);
+            border-color: var(--amber-mid);
         }
 
-        .filter-btn.f-approved.active {
-            border-color: var(--green);
+        .fp.active-approved {
+            background: var(--green-light);
             color: var(--green);
-            background: var(--green-bg);
+            border-color: var(--green-mid);
         }
 
-        .filter-btn.f-rejected.active {
-            border-color: var(--red);
+        .fp.active-rejected {
+            background: var(--red-light);
             color: var(--red);
-            background: var(--red-bg);
+            border-color: var(--red-mid);
         }
 
-        .filter-btn.f-completed.active {
-            border-color: var(--blue);
+        .fp.active-completed {
+            background: var(--blue-light);
             color: var(--blue);
-            background: var(--blue-bg);
+            border-color: #93c5fd;
         }
 
-    /* ── Table ── */
-    .req-table-card {
-        background: #fff;
+    /* ── Table card ── */
+    .sr-table-card {
+        background: var(--white);
         border: 1px solid var(--border);
-        border-radius: var(--radius);
+        border-radius: var(--radius-lg);
         overflow: hidden;
+        box-shadow: var(--shadow-sm);
     }
 
-    .req-table {
+    .sr-table-scroll {
+        overflow-x: auto;
+    }
+
+    .sr-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13px;
+        font-size: 13.5px;
     }
 
-        .req-table thead tr {
+        /* Head */
+        .sr-table thead tr {
             background: var(--gray-bg);
             border-bottom: 1px solid var(--border);
         }
 
-        .req-table th {
-            padding: 11px 14px;
+        .sr-table th {
+            padding: 13px 18px;
             text-align: left;
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: .07em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: var(--text-3);
             white-space: nowrap;
         }
 
-        .req-table tbody tr {
-            border-bottom: 1px solid #f1efe8;
-            transition: background .12s;
+        /* Body rows */
+        .sr-table tbody tr {
+            border-bottom: 1px solid #f3f2ef;
+            transition: background .1s;
         }
 
-            .req-table tbody tr:last-child {
+            .sr-table tbody tr:last-child {
                 border-bottom: none;
             }
 
-            .req-table tbody tr:hover {
-                background: #fafaf7;
+            .sr-table tbody tr:hover {
+                background: #fafaf8;
             }
 
-        .req-table td {
-            padding: 11px 14px;
-            color: var(--text);
+        .sr-table td {
+            padding: 15px 18px;
             vertical-align: middle;
+            color: var(--text);
         }
 
-    .reg-mono {
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        background: #f1efe8;
-        padding: 2px 7px;
-        border-radius: 4px;
-        color: #444;
+    /* Row number */
+    .td-num {
+        font-size: 12px;
+        color: var(--text-3);
+        font-variant-numeric: tabular-nums;
+        font-family: var(--font-mono);
+        width: 36px;
     }
 
-    .user-cell {
+    /* Employee cell */
+    .emp-cell {
         display: flex;
         align-items: center;
-        gap: 9px;
+        gap: 11px;
     }
 
-    .user-avatar {
-        width: 30px;
-        height: 30px;
+    .emp-avatar {
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: var(--blue-bg);
+        background: var(--blue-light);
         color: var(--blue);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        border: 1.5px solid #bfdbfe;
+        letter-spacing: .5px;
     }
 
-    .user-name {
+    .emp-name {
+        font-size: 13.5px;
         font-weight: 600;
-        font-size: 13px;
+        color: var(--text);
+        line-height: 1.3;
     }
 
-    .user-emp {
-        font-size: 11px;
-        color: var(--muted);
+    .emp-sub {
+        font-size: 11.5px;
+        color: var(--text-3);
+        font-family: var(--font-mono);
+        margin-top: 1px;
+    }
+
+    /* Vehicle cell */
+    .veh-cell {
+    }
+
+    .veh-name {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .inuse-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: var(--amber-light);
+        color: var(--amber);
+        border: 1px solid var(--amber-mid);
+        border-radius: 20px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Reg No */
+    .reg-tag {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        padding: 4px 9px;
+        border-radius: 6px;
+        color: var(--text-2);
+        letter-spacing: .3px;
+        white-space: nowrap;
+    }
+
+    /* Date cell */
+    .date-main {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+    }
+
+    .date-sub {
+        font-size: 11.5px;
+        color: var(--text-3);
+        margin-top: 1px;
+        font-family: var(--font-mono);
+    }
+
+    /* Duration chip */
+    .dur-chip {
+        display: inline-block;
+        padding: 4px 10px;
+        background: var(--blue-light);
+        color: var(--blue);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        white-space: nowrap;
+    }
+
+    /* Purpose */
+    .purpose-text {
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        color: var(--text-2);
+    }
+
+    /* Requested on */
+    .req-on {
+        font-size: 12px;
+        color: var(--text-3);
+        white-space: nowrap;
+        font-family: var(--font-mono);
     }
 
     /* Status badges */
     .sbadge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
+        gap: 6px;
+        padding: 5px 12px;
         border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
     }
 
         .sbadge::before {
@@ -265,8 +493,9 @@
         }
 
     .sb-pending {
-        background: var(--amber-bg);
+        background: var(--amber-light);
         color: var(--amber);
+        border: 1px solid var(--amber-mid);
     }
 
         .sb-pending::before {
@@ -274,8 +503,9 @@
         }
 
     .sb-approved {
-        background: var(--green-bg);
+        background: var(--green-light);
         color: var(--green);
+        border: 1px solid var(--green-mid);
     }
 
         .sb-approved::before {
@@ -283,8 +513,9 @@
         }
 
     .sb-rejected {
-        background: var(--red-bg);
+        background: var(--red-light);
         color: var(--red);
+        border: 1px solid var(--red-mid);
     }
 
         .sb-rejected::before {
@@ -292,120 +523,125 @@
         }
 
     .sb-completed {
-        background: var(--blue-bg);
+        background: var(--blue-light);
         color: var(--blue);
+        border: 1px solid #93c5fd;
     }
 
         .sb-completed::before {
             background: var(--blue);
         }
 
-    /* Action buttons */
-    .act-btn {
-        padding: 5px 11px;
-        border-radius: 7px;
-        font-size: 11px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        transition: opacity .15s;
-        white-space: nowrap;
-    }
-
-        .act-btn:hover {
-            opacity: .82;
-        }
-
-    .btn-approve {
-        background: var(--green-bg);
-        color: var(--green);
-    }
-
-    .btn-reject {
-        background: var(--red-bg);
-        color: var(--red);
-    }
-
-    .btn-complete {
-        background: var(--blue-bg);
-        color: var(--blue);
-    }
-
-    .act-group {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
-    .dur-chip {
-        font-weight: 700;
+    /* Admin notes */
+    .note-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 6px;
         font-size: 12px;
-        color: var(--blue);
-    }
-
-    /* Admin notes pill */
-    .admin-note-pill {
-        display: inline-block;
-        padding: 3px 9px;
-        border-radius: 5px;
-        font-size: 11px;
         font-weight: 500;
         max-width: 160px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: default;
-        vertical-align: middle;
     }
 
-    .note-approved {
-        background: var(--green-bg);
-        color: var(--green);
-    }
-
-    .note-rejected {
-        background: var(--red-bg);
-        color: var(--red);
-    }
-
-    /* Empty / Flash */
-    .req-empty {
-        text-align: center;
-        padding: 52px 24px;
-        color: var(--muted);
-    }
-
-        .req-empty .ei {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-    .flash-ok {
-        background: var(--green-bg);
-        color: var(--green);
+    .note-ok {
+        background: var(--green-light);
+        color: #0e7a5c;
         border: 1px solid var(--green-mid);
-        border-radius: 10px;
-        padding: 12px 18px;
-        margin-bottom: 18px;
-        font-size: 13px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
     }
 
-    .flash-err {
-        background: var(--red-bg);
+    .note-bad {
+        background: var(--red-light);
         color: var(--red);
         border: 1px solid var(--red-mid);
-        border-radius: 10px;
-        padding: 12px 18px;
-        margin-bottom: 18px;
-        font-size: 13px;
-        font-weight: 600;
+    }
+
+    .note-none {
+        font-size: 12px;
+        color: var(--border-dark);
+    }
+
+    /* Action buttons */
+    .act-group {
         display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .act-btn {
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
+        padding: 7px 13px;
+        border-radius: var(--radius-sm);
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        transition: all .15s;
+        white-space: nowrap;
+        font-family: var(--font);
+    }
+
+        .act-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        }
+
+    .btn-approve {
+        background: var(--green-light);
+        color: var(--green);
+        border-color: var(--green-mid);
+    }
+
+        .btn-approve:hover {
+            background: #d3f5e8;
+        }
+
+    .btn-reject {
+        background: var(--red-light);
+        color: var(--red);
+        border-color: var(--red-mid);
+    }
+
+        .btn-reject:hover {
+            background: #ffe0e0;
+        }
+
+    .btn-complete {
+        background: var(--blue-light);
+        color: var(--blue);
+        border-color: #93c5fd;
+    }
+
+        .btn-complete:hover {
+            background: #dbeafe;
+        }
+
+    .act-none {
+        font-size: 12px;
+        color: var(--border-dark);
+    }
+
+    /* Empty state */
+    .sr-empty {
+        text-align: center;
+        padding: 64px 24px;
+        color: var(--text-3);
+    }
+
+    .sr-empty-icon {
+        font-size: 44px;
+        margin-bottom: 14px;
+    }
+
+    .sr-empty p {
+        font-size: 14px;
+        margin: 0;
     }
 
     /* ── Modal ── */
@@ -413,8 +649,8 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(44,44,42,.5);
-        backdrop-filter: blur(3px);
+        background: rgba(15,15,14,.4);
+        backdrop-filter: blur(4px);
         z-index: 999;
         align-items: center;
         justify-content: center;
@@ -425,19 +661,19 @@
         }
 
     .modal-box {
-        background: #fff;
-        border-radius: var(--radius);
+        background: var(--white);
+        border-radius: var(--radius-lg);
         width: 100%;
-        max-width: 440px;
+        max-width: 460px;
         margin: 16px;
         overflow: hidden;
-        animation: modalIn .22s cubic-bezier(.34,1.4,.64,1);
-        box-shadow: 0 16px 48px rgba(0,0,0,.14);
+        box-shadow: 0 24px 64px rgba(0,0,0,.16);
+        animation: modalIn .2s cubic-bezier(.34,1.3,.64,1);
     }
 
     @@keyframes modalIn {
         from {
-            transform: scale(.94) translateY(12px);
+            transform: scale(.95) translateY(10px);
             opacity: 0;
         }
 
@@ -448,7 +684,7 @@
     }
 
     .modal-hd {
-        padding: 18px 22px;
+        padding: 20px 24px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -460,25 +696,28 @@
             font-weight: 700;
             margin: 0;
             color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .modal-hd.hd-approve {
-            background: var(--green-bg);
-            border-color: var(--green-mid);
-        }
+    .hd-approve {
+        background: var(--green-light);
+        border-color: var(--green-mid);
+    }
 
-        .modal-hd.hd-reject {
-            background: var(--red-bg);
-            border-color: var(--red-mid);
-        }
+    .hd-reject {
+        background: var(--red-light);
+        border-color: var(--red-mid);
+    }
 
     .modal-close {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        background: none;
-        border: 1px solid var(--border);
-        color: var(--muted);
+        background: rgba(0,0,0,.06);
+        border: none;
+        color: var(--text-2);
         font-size: 16px;
         cursor: pointer;
         display: flex;
@@ -488,131 +727,132 @@
     }
 
         .modal-close:hover {
-            background: var(--border);
+            background: rgba(0,0,0,.12);
         }
 
     .modal-bd {
-        padding: 22px;
+        padding: 24px;
     }
 
     .modal-req-info {
         background: var(--gray-bg);
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 18px;
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin-bottom: 20px;
     }
 
-    .mri-name {
-        font-size: 14px;
+    .mri-vehicle {
+        font-size: 15px;
         font-weight: 700;
         color: var(--text);
         margin-bottom: 4px;
     }
 
-    .mri-meta {
-        font-size: 12px;
-        color: var(--muted);
+    .mri-user {
+        font-size: 12.5px;
+        color: var(--text-3);
     }
 
-    .notes-label {
+    .form-label {
         display: block;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 700;
         letter-spacing: .06em;
         text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 6px;
+        color: var(--text-3);
+        margin-bottom: 7px;
     }
 
-        .notes-label span {
+        .form-label span {
             font-weight: 400;
             text-transform: none;
             letter-spacing: 0;
+            color: var(--text-3);
         }
 
-    .notes-textarea {
+    .modal-textarea {
         width: 100%;
-        padding: 10px 13px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
+        padding: 11px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
         color: var(--text);
-        background: #fff;
+        background: var(--white);
         box-sizing: border-box;
         outline: none;
         resize: vertical;
-        font-family: 'Segoe UI', sans-serif;
-        transition: border-color .15s;
-        min-height: 88px;
+        font-family: var(--font);
+        transition: border-color .15s, box-shadow .15s;
+        min-height: 92px;
+        line-height: 1.5;
     }
 
-        .notes-textarea:focus {
+        .modal-textarea:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(29,158,117,.1);
+            box-shadow: 0 0 0 3px rgba(22,163,122,.1);
         }
 
-        .notes-textarea.reject:focus {
+        .modal-textarea.ta-reject:focus {
             border-color: var(--red);
-            box-shadow: 0 0 0 3px rgba(163,45,45,.1);
+            box-shadow: 0 0 0 3px rgba(184,53,53,.1);
         }
 
-    .notes-hint {
-        font-size: 11px;
-        color: var(--muted);
-        margin-top: 5px;
+    .modal-hint {
+        font-size: 11.5px;
+        color: var(--text-3);
+        margin-top: 6px;
     }
 
     .modal-actions {
         display: flex;
         gap: 10px;
-        margin-top: 18px;
+        margin-top: 20px;
     }
 
     .btn-cancel {
         flex: 1;
-        padding: 10px;
+        padding: 11px;
         background: var(--gray-bg);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
         font-weight: 600;
-        color: var(--muted);
+        color: var(--text-2);
         cursor: pointer;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: var(--font);
         transition: background .15s;
     }
 
         .btn-cancel:hover {
-            background: var(--border);
+            background: #eeede9;
         }
 
     .btn-confirm {
         flex: 2;
-        padding: 10px;
+        padding: 11px;
         border: none;
-        border-radius: 8px;
-        font-size: 13px;
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
         font-weight: 700;
         cursor: pointer;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: var(--font);
         transition: opacity .15s, transform .1s;
+        color: #fff;
     }
 
         .btn-confirm:hover {
-            opacity: .88;
+            opacity: .9;
             transform: translateY(-1px);
         }
 
-        .btn-confirm.confirm-approve {
-            background: var(--green);
-            color: #fff;
-        }
+    .confirm-approve {
+        background: var(--green);
+    }
 
-        .btn-confirm.confirm-reject {
-            background: var(--red);
-            color: #fff;
-        }
+    .confirm-reject {
+        background: var(--red);
+    }
 </style>
 
 <div class="ab-shell">
@@ -621,51 +861,77 @@
         @await Html.PartialAsync("_AdminTopbar")
         <div class="ab-content">
 
-            <div class="page-header">
-                <div class="page-title">📋 Vehicle Requests</div>
-                <div class="page-sub">Review, approve or reject user vehicle requests.</div>
+            <!-- Page header -->
+            <div class="sr-page-header">
+                <h1>Vehicle Requests</h1>
+                <p>Review, approve or reject incoming vehicle requests from employees.</p>
             </div>
 
+            <!-- Flash messages -->
             @if (TempData["Success"] != null)
             {
-                <div class="flash-ok">✅ @TempData["Success"]</div>
+                <div class="flash flash-ok">✅ @TempData["Success"]</div>
             }
             @if (TempData["Error"] != null)
             {
-                <div class="flash-err">⚠️ @TempData["Error"]</div>
+                <div class="flash flash-err">⚠️ @TempData["Error"]</div>
             }
 
-            @* Summary *@
-            <div class="req-summary">
-                <div class="req-stat rs-total">    <div class="rs-label">Total</div>     <div class="rs-num">@Model.TotalCount</div>     </div>
-                <div class="req-stat rs-pending">  <div class="rs-label">Pending</div>   <div class="rs-num">@Model.PendingCount</div>   </div>
-                <div class="req-stat rs-approved"> <div class="rs-label">Approved</div>  <div class="rs-num">@Model.ApprovedCount</div>  </div>
-                <div class="req-stat rs-rejected"> <div class="rs-label">Rejected</div>  <div class="rs-num">@Model.RejectedCount</div>  </div>
-                <div class="req-stat rs-completed"><div class="rs-label">Completed</div> <div class="rs-num">@Model.CompletedCount</div> </div>
+            <!-- Summary stats -->
+            <div class="sr-stats">
+                <div class="stat-card stat-total" onclick="setFilter('all', document.querySelector('.fp[data-f=all]'))">
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value">@Model.TotalCount</div>
+                </div>
+                <div class="stat-card stat-pending" onclick="setFilter('pending', document.querySelector('.fp[data-f=pending]'))">
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value">@Model.PendingCount</div>
+                </div>
+                <div class="stat-card stat-approved" onclick="setFilter('approved', document.querySelector('.fp[data-f=approved]'))">
+                    <div class="stat-label">Approved</div>
+                    <div class="stat-value">@Model.ApprovedCount</div>
+                </div>
+                <div class="stat-card stat-rejected" onclick="setFilter('rejected', document.querySelector('.fp[data-f=rejected]'))">
+                    <div class="stat-label">Rejected</div>
+                    <div class="stat-value">@Model.RejectedCount</div>
+                </div>
+                <div class="stat-card stat-completed" onclick="setFilter('completed', document.querySelector('.fp[data-f=completed]'))">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value">@Model.CompletedCount</div>
+                </div>
             </div>
 
-            @* Filter bar *@
-            <div class="filter-bar">
-                <input class="filter-search" id="reqSearch" type="text" placeholder="🔍  Search by name, vehicle, emp no, reg…" />
-                <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-                <button class="filter-btn f-pending" onclick="setFilter('pending',this)">Pending</button>
-                <button class="filter-btn f-approved" onclick="setFilter('approved',this)">Approved</button>
-                <button class="filter-btn f-rejected" onclick="setFilter('rejected',this)">Rejected</button>
-                <button class="filter-btn f-completed" onclick="setFilter('completed',this)">Completed</button>
+            <!-- Toolbar -->
+            <div class="sr-toolbar">
+                <div class="sr-search-wrap">
+                    <span class="sr-search-icon">🔍</span>
+                    <input class="sr-search" id="reqSearch" type="text"
+                           placeholder="Search by name, vehicle, emp no, reg no…" />
+                </div>
+                <div class="filter-pills">
+                    <button class="fp active-all" data-f="all" onclick="setFilter('all',this)">All</button>
+                    <button class="fp" data-f="pending" onclick="setFilter('pending',this)">Pending</button>
+                    <button class="fp" data-f="approved" onclick="setFilter('approved',this)">Approved</button>
+                    <button class="fp" data-f="rejected" onclick="setFilter('rejected',this)">Rejected</button>
+                    <button class="fp" data-f="completed" onclick="setFilter('completed',this)">Completed</button>
+                </div>
             </div>
 
-            @* Table *@
+            <!-- Table -->
             @if (!Model.AllRequests.Any())
             {
-                <div class="req-table-card">
-                    <div class="req-empty"><div class="ei">📭</div><p>No vehicle requests have been submitted yet.</p></div>
+                <div class="sr-table-card">
+                    <div class="sr-empty">
+                        <div class="sr-empty-icon">📭</div>
+                        <p>No vehicle requests have been submitted yet.</p>
+                    </div>
                 </div>
             }
             else
             {
-                <div class="req-table-card">
-                    <div style="overflow-x:auto;">
-                        <table class="req-table" id="reqTable">
+                <div class="sr-table-card">
+                    <div class="sr-table-scroll">
+                        <table class="sr-table" id="reqTable">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -688,9 +954,18 @@
                                 }
                                 @foreach (var r in Model.AllRequests)
                                 {
+                                    bool vehicleCurrentlyInUse = Model.AllRequests.Any(other =>
+                                    other.VehicleId == r.VehicleId &&
+                                    other.Id != r.Id &&
+                                    other.Status == "Approved" &&
+                                    other.StartTime <= DateTime.Now &&
+                                    other.EndTime >= DateTime.Now);
+
                                     double hrs = (r.EndTime - r.StartTime).TotalHours;
-                                    string dur = hrs >= 24 ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
-                                    : hrs >= 1 ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
+                                    string dur = hrs >= 24
+                                    ? $"{(int)(hrs / 24)}d {(int)(hrs % 24)}h"
+                                    : hrs >= 1
+                                    ? $"{(int)hrs}h {(int)((hrs % 1) * 60)}m"
                                     : $"{(int)(hrs * 60)}m";
 
                                     string sbClass = r.Status.ToLower() switch
@@ -712,61 +987,86 @@
 
                                     <tr class="req-row"
                                         data-status="@r.Status.ToLower()"
-                                        data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower()">
+                                        data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower() @(vehicleCurrentlyInUse ? "in use" : "")">
 
-                                        <td style="color:#b4b2a9;font-size:11px;">@i</td>
+                                        <!-- # -->
+                                        <td class="td-num">@i</td>
 
+                                        <!-- Employee -->
                                         <td>
-                                            <div class="user-cell">
-                                                <div class="user-avatar">@initials</div>
+                                            <div class="emp-cell">
+                                                <div class="emp-avatar">@initials</div>
                                                 <div>
-                                                    <div class="user-name">@r.UserName</div>
-                                                    <div class="user-emp">@r.EmployeeNumber &nbsp;·&nbsp; @r.UserMobile</div>
+                                                    <div class="emp-name">@r.UserName</div>
+                                                    <div class="emp-sub">@r.EmployeeNumber · @r.UserMobile</div>
                                                 </div>
                                             </div>
                                         </td>
 
-                                        <td style="font-weight:600;">@r.VehicleName</td>
-                                        <td><span class="reg-mono">@r.RegistrationNumber</span></td>
-
-                                        <td style="font-size:12px;white-space:nowrap;">
-                                            @r.StartTime.ToString("dd MMM yy")<br />
-                                            <span style="color:var(--muted)">@r.StartTime.ToString("hh:mm tt")</span>
+                                        <!-- Vehicle -->
+                                        <td>
+                                            <div class="veh-name">
+                                                @r.VehicleName
+                                                @if (vehicleCurrentlyInUse && r.Status == "Pending")
+                                                {
+                                                    <span class="inuse-tag">🔑 In Use</span>
+                                                }
+                                            </div>
                                         </td>
-                                        <td style="font-size:12px;white-space:nowrap;">
-                                            @r.EndTime.ToString("dd MMM yy")<br />
-                                            <span style="color:var(--muted)">@r.EndTime.ToString("hh:mm tt")</span>
+
+                                        <!-- Reg No -->
+                                        <td><span class="reg-tag">@r.RegistrationNumber</span></td>
+
+                                        <!-- Start -->
+                                        <td>
+                                            <div class="date-main">@r.StartTime.ToString("dd MMM yyyy")</div>
+                                            <div class="date-sub">@r.StartTime.ToString("hh:mm tt")</div>
                                         </td>
 
+                                        <!-- End -->
+                                        <td>
+                                            <div class="date-main">@r.EndTime.ToString("dd MMM yyyy")</div>
+                                            <div class="date-sub">@r.EndTime.ToString("hh:mm tt")</div>
+                                        </td>
+
+                                        <!-- Duration -->
                                         <td><span class="dur-chip">@dur</span></td>
 
-                                        <td style="color:var(--muted);font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                            @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
+                                        <!-- Purpose -->
+                                        <td>
+                                            <div class="purpose-text" title="@r.Purpose">
+                                                @(string.IsNullOrEmpty(r.Purpose) ? "—" : r.Purpose)
+                                            </div>
                                         </td>
 
-                                        <td style="font-size:11px;color:var(--muted);white-space:nowrap;">
-                                            @r.CreatedAt.ToString("dd MMM yy, hh:mm tt")
+                                        <!-- Requested On -->
+                                        <td>
+                                            <div class="req-on">
+                                                @r.CreatedAt.ToString("dd MMM yy")<br />
+                                                @r.CreatedAt.ToString("hh:mm tt")
+                                            </div>
                                         </td>
 
+                                        <!-- Status -->
                                         <td><span class="sbadge @sbClass">@r.Status</span></td>
 
-                                        @* ── Admin Notes ── *@
+                                        <!-- Admin Notes -->
                                         <td>
                                             @if (!string.IsNullOrEmpty(r.AdminNotes))
                                             {
                                                 string noteClass = (r.Status == "Approved" || r.Status == "Completed")
-                                                ? "note-approved" : "note-rejected";
-                                                <span class="admin-note-pill @noteClass" title="@r.AdminNotes">
+                                                ? "note-ok" : "note-bad";
+                                                <span class="note-pill @noteClass" title="@r.AdminNotes">
                                                     💬 @r.AdminNotes
                                                 </span>
                                             }
                                             else
                                             {
-                                                <span style="font-size:11px;color:#ccc;">—</span>
+                                                <span class="note-none">—</span>
                                             }
                                         </td>
 
-                                        @* ── Actions ── *@
+                                        <!-- Actions -->
                                         <td>
                                             <div class="act-group">
                                                 @if (r.Status == "Pending")
@@ -782,14 +1082,17 @@
                                                 }
                                                 else if (r.Status == "Approved")
                                                 {
-                                                    <form asp-action="CompleteRequest" asp-controller="Autobase" method="post" style="display:inline;">
+                                                    <form asp-action="CompleteRequest" asp-controller="Autobase"
+                                                          method="post" style="display:inline;">
                                                         <input type="hidden" name="id" value="@r.Id" />
-                                                        <button type="submit" class="act-btn btn-complete">✔ Mark Returned</button>
+                                                        <button type="submit" class="act-btn btn-complete">
+                                                            ✔ Mark Returned
+                                                        </button>
                                                     </form>
                                                 }
                                                 else
                                                 {
-                                                    <span style="font-size:11px;color:var(--muted);">—</span>
+                                                    <span class="act-none">—</span>
                                                 }
                                             </div>
                                         </td>
@@ -806,7 +1109,7 @@
     </div>
 </div>
 
-@* ── Approve Modal ── *@
+<!-- ── Approve Modal ── -->
 <div class="modal-overlay" id="approveModal">
     <div class="modal-box">
         <div class="modal-hd hd-approve">
@@ -815,15 +1118,15 @@
         </div>
         <div class="modal-bd">
             <div class="modal-req-info">
-                <div class="mri-name" id="ap-vehicle">—</div>
-                <div class="mri-meta" id="ap-user">—</div>
+                <div class="mri-vehicle" id="ap-vehicle">—</div>
+                <div class="mri-user" id="ap-user">—</div>
             </div>
             <form asp-action="ApproveRequest" asp-controller="Autobase" method="post">
                 <input type="hidden" name="Id" id="ap-id" />
-                <label class="notes-label">Approval Notes <span>(optional)</span></label>
-                <textarea class="notes-textarea" name="Notes" id="ap-notes"
+                <label class="form-label">Approval Notes <span>(optional)</span></label>
+                <textarea class="modal-textarea" name="Notes" id="ap-notes"
                           placeholder="e.g. Approved for official use. Please return by end of day."></textarea>
-                <p class="notes-hint">These notes will be visible to the employee in their request history.</p>
+                <p class="modal-hint">These notes will be visible to the employee in their request history.</p>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
                     <button type="submit" class="btn-confirm confirm-approve">✔ Confirm Approval</button>
@@ -833,7 +1136,7 @@
     </div>
 </div>
 
-@* ── Reject Modal ── *@
+<!-- ── Reject Modal ── -->
 <div class="modal-overlay" id="rejectModal">
     <div class="modal-box">
         <div class="modal-hd hd-reject">
@@ -842,15 +1145,15 @@
         </div>
         <div class="modal-bd">
             <div class="modal-req-info">
-                <div class="mri-name" id="rj-vehicle">—</div>
-                <div class="mri-meta" id="rj-user">—</div>
+                <div class="mri-vehicle" id="rj-vehicle">—</div>
+                <div class="mri-user" id="rj-user">—</div>
             </div>
             <form asp-action="RejectRequest" asp-controller="Autobase" method="post">
                 <input type="hidden" name="Id" id="rj-id" />
-                <label class="notes-label">Reason for Rejection <span>(recommended)</span></label>
-                <textarea class="notes-textarea reject" name="Notes" id="rj-notes"
+                <label class="form-label">Reason for Rejection <span>(recommended)</span></label>
+                <textarea class="modal-textarea ta-reject" name="Notes" id="rj-notes"
                           placeholder="e.g. Vehicle already booked. Please try a different date or time."></textarea>
-                <p class="notes-hint">The employee will see this reason alongside their rejected request.</p>
+                <p class="modal-hint">The employee will see this reason alongside their rejected request.</p>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
                     <button type="submit" class="btn-confirm confirm-reject">✘ Confirm Rejection</button>
@@ -867,8 +1170,12 @@
 
         function setFilter(status, btn) {
             activeFilter = status;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            // Reset all pills
+            document.querySelectorAll('.fp').forEach(b => {
+                b.className = 'fp';
+            });
+            // Activate clicked
+            if (btn) btn.classList.add('active-' + status);
             applyFilters();
         }
 
@@ -883,20 +1190,38 @@
             });
         }
 
+        // Stat card click — sync pill active state
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const map = {
+                    'stat-total': 'all', 'stat-pending': 'pending',
+                    'stat-approved': 'approved', 'stat-rejected': 'rejected',
+                    'stat-completed': 'completed'
+                };
+                for (const [cls, status] of Object.entries(map)) {
+                    if (this.classList.contains(cls)) {
+                        const pill = document.querySelector(`.fp[data-f="${status}"]`);
+                        setFilter(status, pill);
+                        break;
+                    }
+                }
+            });
+        });
+
         /* ── Modals ── */
         function openApprove(id, userName, empNo, vehicleName) {
-            document.getElementById('ap-id').value = id;
-            document.getElementById('ap-vehicle').textContent = vehicleName;
-            document.getElementById('ap-user').textContent    = userName + '  ·  ' + empNo;
-            document.getElementById('ap-notes').value = '';
+            document.getElementById('ap-id').value              = id;
+            document.getElementById('ap-vehicle').textContent   = vehicleName;
+            document.getElementById('ap-user').textContent      = userName + '  ·  ' + empNo;
+            document.getElementById('ap-notes').value           = '';
             document.getElementById('approveModal').classList.add('open');
         }
 
         function openReject(id, userName, empNo, vehicleName) {
-            document.getElementById('rj-id').value = id;
-            document.getElementById('rj-vehicle').textContent = vehicleName;
-            document.getElementById('rj-user').textContent    = userName + '  ·  ' + empNo;
-            document.getElementById('rj-notes').value = '';
+            document.getElementById('rj-id').value              = id;
+            document.getElementById('rj-vehicle').textContent   = vehicleName;
+            document.getElementById('rj-user').textContent      = userName + '  ·  ' + empNo;
+            document.getElementById('rj-notes').value           = '';
             document.getElementById('rejectModal').classList.add('open');
         }
 

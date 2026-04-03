@@ -50,6 +50,7 @@ namespace autobase.Controllers
     .OrderBy(r => r.EndTime)
     .Select(r => new InUseVehicleInfo
     {
+        VehicleId = r.VehicleId,
         VehicleName = r.VehicleName,
         RegistrationNumber = r.RegistrationNumber,
         VehicleType = r.VehicleType,
@@ -62,7 +63,6 @@ namespace autobase.Controllers
 
             return View(model);
         }
-
         // ── POST: Submit Vehicle Request ──
         [HttpPost]
         public IActionResult RequestVehicle(VehicleRequestViewModel model)
@@ -77,7 +77,9 @@ namespace autobase.Controllers
             }
 
             var vehicle = _db.Vehicles.Find(model.VehicleId);
-            if (vehicle == null || !vehicle.IsActive || vehicle.Status != "Available")
+
+            // ✅ CHANGED: Allow "In Use" vehicles too (for future bookings)
+            if (vehicle == null || !vehicle.IsActive)
             {
                 TempData["Error"] = "This vehicle is no longer available.";
                 return RedirectToAction("Dashboard");
@@ -86,6 +88,19 @@ namespace autobase.Controllers
             if (model.EndTime <= model.StartTime)
             {
                 TempData["Error"] = "End time must be after start time.";
+                return RedirectToAction("Dashboard");
+            }
+
+            // ✅ NEW: Block only if there's an actual time overlap with an approved booking
+            bool hasConflict = _db.VehicleRequests.Any(r =>
+                r.VehicleId == model.VehicleId &&
+                r.Status == "Approved" &&
+                r.StartTime < model.EndTime &&
+                r.EndTime > model.StartTime);
+
+            if (hasConflict)
+            {
+                TempData["Error"] = "This vehicle already has an approved booking that overlaps your requested time. Please choose a different time.";
                 return RedirectToAction("Dashboard");
             }
 
