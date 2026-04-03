@@ -556,53 +556,139 @@
     </div>
 
     @* ── Available Vehicles ── *@
-    <div class="section-title">🚗 Available Vehicles (@Model.AvailableVehicles.Count)</div>
+<div class="section-title">🚗 Available Vehicles (@Model.AvailableVehicles.Count)</div>
+@if (!Model.AvailableVehicles.Any())
+{
+    <div class="empty-state"><div class="ei">🚘</div><p>No vehicles are available right now.</p></div>
+}
+else
+{
+    @* Build a JS-friendly JSON of all available vehicles *@
+    <script>
+        const allAvailableVehicles = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.AvailableVehicles.Select(v => new {
+                v.Id,
+                v.VehicleName,
+                v.RegistrationNumber,
+                v.VehicleType,
+                v.Year,
+                v.Notes
+            })
+        ));
+    </script>
 
-    @if (!Model.AvailableVehicles.Any())
-    {
-        <div class="empty-state">
-            <div class="ei">🚘</div>
-            <p>No vehicles are available right now. Please check back later.</p>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:24px;">
+        <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label>Vehicle Type</label>
+                <select id="filterType" onchange="filterByType()" 
+                        style="width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#fff;outline:none;cursor:pointer;">
+                    <option value="">— Select a type —</option>
+                    @foreach (var type in Model.AvailableVehicles.Select(v => v.VehicleType).Distinct().OrderBy(t => t))
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label>Vehicle Name</label>
+                <select id="filterVehicle" onchange="showSelectedVehicle()" disabled
+                        style="width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#fff;outline:none;cursor:pointer;">
+                    <option value="">— Select type first —</option>
+                </select>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="vehicle-grid">
-            @foreach (var v in Model.AvailableVehicles)
-            {
-                <div class="vehicle-card">
-                    <div class="vc-top">
-                        <div class="vc-avail-dot"></div>
-                        <div class="vc-type-badge">@v.VehicleType</div>
-                        <div class="vc-name">@v.VehicleName</div>
-                        <div class="vc-reg">@v.RegistrationNumber</div>
-                    </div>
-                    <div class="vc-body">
-                        <div class="vc-detail">
-                            <span>Year</span>
-                            <strong>@v.Year</strong>
-                        </div>
-                        <div class="vc-detail">
-                            <span>Status</span>
-                            <strong style="color: var(--green);">Available</strong>
-                        </div>
-                        @if (!string.IsNullOrEmpty(v.Notes))
-                        {
-                            <div class="vc-detail">
-                                <span>Notes</span>
-                                <strong style="font-size:11px; max-width:140px; text-align:right;">@v.Notes</strong>
-                            </div>
-                        }
-                        <button class="request-btn"
-                                onclick="openModal(@v.Id, '@v.VehicleName', '@v.RegistrationNumber', '@v.VehicleType')">
-                            + Request This Vehicle
-                        </button>
-                    </div>
+
+        <div id="selectedVehicleCard" style="display:none;">
+            <div class="vehicle-card" style="max-width:340px;">
+                <div class="vc-top">
+                    <div class="vc-avail-dot"></div>
+                    <div class="vc-type-badge" id="sv-type"></div>
+                    <div class="vc-name" id="sv-name"></div>
+                    <div class="vc-reg"  id="sv-reg"></div>
                 </div>
-            }
+                <div class="vc-body">
+                    <div class="vc-detail"><span>Year</span><strong id="sv-year"></strong></div>
+                    <div class="vc-detail"><span>Status</span><strong style="color:var(--green);">Available</strong></div>
+                    <div class="vc-detail" id="sv-notes-row" style="display:none;">
+                        <span>Notes</span>
+                        <strong id="sv-notes" style="font-size:11px;max-width:140px;text-align:right;"></strong>
+                    </div>
+                    <button class="request-btn" id="sv-btn" onclick="">+ Request This Vehicle</button>
+                </div>
+            </div>
         </div>
-    }
+        <div id="noVehicleHint" style="font-size:13px;color:var(--muted);padding:8px 0;">
+            Select a vehicle type to get started.
+        </div>
+    </div>
+}
+    @* ── In Use ── *@
+<div class="section-title">🔑 In Use (@Model.InUseVehicles.Count)</div>
+@if (!Model.InUseVehicles.Any())
+{
+    <div class="empty-state"><div class="ei">✅</div><p>No vehicles are currently in use.</p></div>
+}
+else
+{
+    <div class="inuse-grid">
+        @foreach (var v in Model.InUseVehicles)
+        {
+            var remaining = v.EndTime - DateTime.Now;
+            string countdownText;
+            string countdownStyle = "";
+            if (remaining.TotalMinutes <= 0)
+            {
+                countdownText = "⚠️ Overdue — should have returned by " + v.EndTime.ToString("hh:mm tt");
+                countdownStyle = "background:#fcebeb;border-color:#f7c1c1;color:#a32d2d;";
+            }
+            else if (remaining.TotalMinutes < 60)
+                countdownText = $"⏳ Available in ~{(int)remaining.TotalMinutes} min";
+            else if (remaining.TotalHours < 24)
+                countdownText = $"⏳ Available at {v.EndTime:hh:mm tt} today";
+            else
+                countdownText = $"⏳ Available on {v.EndTime:dd MMM} at {v.EndTime:hh:mm tt}";
 
+            // Count how many pending/approved future bookings exist for this vehicle
+            int queueCount = Model.MyRequests
+                .Count(r => r.VehicleId == v.VehicleId
+                         && r.StartTime >= v.EndTime
+                         && (r.Status == "Pending" || r.Status == "Approved"));
+
+            <div class="inuse-card">
+                <div class="vc-top-inuse">
+                    <div class="vc-avail-dot-inuse"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <div class="vc-type-badge-inuse">@v.VehicleType</div>
+                        @if (queueCount > 0)
+                        {
+                            <span style="font-size:10px;font-weight:700;background:rgba(186,117,23,.2);color:var(--amber);padding:2px 9px;border-radius:20px;">
+                                📋 @queueCount in queue
+                            </span>
+                        }
+                    </div>
+                    <div class="vc-name">@v.VehicleName</div>
+                    <div class="vc-reg">@v.RegistrationNumber</div>
+                </div>
+                <div class="vc-body">
+                    <div class="vc-detail"><span>In use by</span><strong>@v.UserName</strong></div>
+                    <div class="vc-detail"><span>Emp No</span><strong>@v.EmployeeNumber</strong></div>
+                    <div class="vc-detail"><span>Due back</span><strong style="font-size:11px;">@v.EndTime.ToString("dd MMM, hh:mm tt")</strong></div>
+                    <span class="avail-countdown" style="@countdownStyle">@countdownText</span>
+
+                    @* ── Book After Return button ── *@
+                    <button
+                        onclick="openModalAfterReturn(@v.VehicleId, '@v.VehicleName', '@v.RegistrationNumber', '@v.VehicleType', '@v.EndTime.ToString("yyyy-MM-ddTHH:mm")')"
+                        style="display:block;width:100%;margin-top:10px;padding:9px;background:#fff;color:var(--amber);border:1.5px solid var(--amber);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;"
+                        onmouseover="this.style.background='var(--amber-bg)'"
+                        onmouseout="this.style.background='#fff'">
+                        📅 Book After Return (@v.EndTime.ToString("hh:mm tt"))
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
     @* ── My Requests ── *@
     <div class="section-title">📋 My Requests (@Model.MyRequests.Count)</div>
 
@@ -701,7 +787,7 @@
 <div class="modal-overlay" id="requestModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h5>🚗 Request Vehicle</h5>
+            <h5 id="modalTitle">🚗 Request Vehicle</h5>
             <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -747,57 +833,151 @@
 
 @section Scripts {
     <script>
-        function openModal(id, name, reg, type) {
-            document.getElementById('modalVehicleId').value  = id;
-            document.getElementById('modalVehicleName').textContent = name;
-            document.getElementById('modalVehicleReg').textContent  = reg;
-            document.getElementById('modalVehicleType').textContent = type;
+        /* ── Available-vehicles filter ── */
+function filterByType() {
+    const type = document.getElementById('filterType').value;
+    const selV = document.getElementById('filterVehicle');
+    const card = document.getElementById('selectedVehicleCard');
+    const hint = document.getElementById('noVehicleHint');
 
-            // Default start = now, end = now + 2 hours
-            const now = new Date();
-            const later = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-            document.getElementById('startTime').value = toLocalISO(now);
-            document.getElementById('endTime').value   = toLocalISO(later);
-            updateDuration();
+    selV.innerHTML = '<option value="">— Select a vehicle —</option>';
+    card.style.display = 'none';
 
-            document.getElementById('requestModal').classList.add('open');
-        }
+    if (!type) {
+        selV.disabled = true;
+        hint.style.display = 'block';
+        hint.textContent = 'Select a vehicle type to get started.';
+        return;
+    }
 
-        function closeModal() {
-            document.getElementById('requestModal').classList.remove('open');
-        }
+    // ✅ Use PascalCase to match C# JSON serialization
+    const filtered = allAvailableVehicles.filter(v => v.VehicleType === type);
+    filtered.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.Id;
+        opt.textContent = v.VehicleName + ' (' + v.RegistrationNumber + ')';
+        selV.appendChild(opt);
+    });
 
-        // Close on backdrop click
-        document.getElementById('requestModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
+    selV.disabled = false;
+    hint.style.display = 'block';
+    hint.textContent = filtered.length + ' vehicle' + (filtered.length !== 1 ? 's' : '') + ' of this type available.';
+}
+function showSelectedVehicle() {
+    const id   = parseInt(document.getElementById('filterVehicle').value);
+    const card = document.getElementById('selectedVehicleCard');
+    const hint = document.getElementById('noVehicleHint');
 
-        function toLocalISO(date) {
-            const pad = n => String(n).padStart(2, '0');
-            return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-        }
+    if (!id) { card.style.display = 'none'; return; }
 
-        function updateDuration() {
-            const s = document.getElementById('startTime').value;
-            const e = document.getElementById('endTime').value;
-            const el = document.getElementById('durationDisplay');
-            if (!s || !e) return;
-            const diffMs = new Date(e) - new Date(s);
-            if (diffMs <= 0) {
-                el.style.background = '#fcebeb';
-                el.style.color = '#a32d2d';
-                el.style.borderColor = '#f7c1c1';
-                el.textContent = '⚠️ End time must be after start time';
-                return;
-            }
-            el.style.background = '#e1f5ee';
-            el.style.color = '#1d9e75';
-            el.style.borderColor = '#9fe1cb';
-            const hrs  = Math.floor(diffMs / 3600000);
-            const mins = Math.floor((diffMs % 3600000) / 60000);
-            el.textContent = hrs > 0
-                ? `⏱ Duration: ${hrs} hour${hrs !== 1 ? 's' : ''} ${mins > 0 ? mins + ' min' : ''}`
-                : `⏱ Duration: ${mins} minute${mins !== 1 ? 's' : ''}`;
-        }
+    // ✅ Use PascalCase to match C# JSON serialization
+    const v = allAvailableVehicles.find(x => x.Id === id);
+    if (!v) return;
+
+    document.getElementById('sv-type').textContent = v.VehicleType;
+    document.getElementById('sv-name').textContent = v.VehicleName;
+    document.getElementById('sv-reg').textContent  = v.RegistrationNumber;
+    document.getElementById('sv-year').textContent = v.Year;
+
+    const notesRow = document.getElementById('sv-notes-row');
+    if (v.Notes) {
+        document.getElementById('sv-notes').textContent = v.Notes;
+        notesRow.style.display = 'flex';
+    } else {
+        notesRow.style.display = 'none';
+    }
+
+    const btn = document.getElementById('sv-btn');
+    btn.onclick = function() { openModal(v.Id, v.VehicleName, v.RegistrationNumber, v.VehicleType); };
+
+    card.style.display = 'block';
+    hint.style.display = 'none';
+}
+
+/* ── Request modal (normal) ── */
+function openModal(id, name, reg, type) {
+    document.getElementById('modalTitle').textContent = '🚗 Request Vehicle';
+    document.getElementById('modalVehicleName').textContent = name;
+    document.getElementById('modalVehicleReg').textContent  = reg;
+    document.getElementById('modalVehicleType').textContent = type;
+    const now   = new Date();
+    const later = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    document.getElementById('startTime').value = toLocalISO(now);
+    document.getElementById('endTime').value   = toLocalISO(later);
+    updateDuration();
+    document.getElementById('requestModal').classList.add('open');
+}
+
+/* ── Request modal (book after return) ── */
+function openModalAfterReturn(id, name, reg, type, returnIso) {
+    document.getElementById('modalTitle').textContent = '📅 Schedule After Return';  // ← ADD THIS
+    document.getElementById('modalVehicleId').value         = id;
+    document.getElementById('modalVehicleName').textContent = name;
+    document.getElementById('modalVehicleReg').textContent  = reg;
+    document.getElementById('modalVehicleType').textContent = type;
+
+    // Start = vehicle's return time; End = 2 hours after that
+    const start = new Date(returnIso);
+    const end   = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    document.getElementById('startTime').value = toLocalISO(start);
+    document.getElementById('endTime').value   = toLocalISO(end);
+    updateDuration();
+    document.getElementById('requestModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('requestModal').classList.remove('open'); }
+document.getElementById('requestModal').addEventListener('click', function(e) { if (e.target===this) closeModal(); });
+
+/* ── Profile modal ── */
+function openProfileModal()  { document.getElementById('profileModal').classList.add('open');    }
+function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
+document.getElementById('profileModal').addEventListener('click', function(e) { if (e.target===this) closeProfileModal(); });
+
+/* ── Tabs ── */
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.profile-tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+@if (TempData["PasswordSuccess"] != null || TempData["PasswordError"] != null)
+{
+    <text>
+    window.addEventListener('DOMContentLoaded', function() {
+        openProfileModal();
+        switchTab('tabPw', document.querySelectorAll('.profile-tab')[1]);
+    });
+    </text>
+}
+
+/* ── Password toggle ── */
+function togglePw(id) {
+    const i = document.getElementById(id);
+    i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+/* ── Duration ── */
+function toLocalISO(date) {
+    const pad = n => String(n).padStart(2,'0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function updateDuration() {
+    const s = document.getElementById('startTime').value;
+    const e = document.getElementById('endTime').value;
+    const el = document.getElementById('durationDisplay');
+    if (!s || !e) return;
+    const diffMs = new Date(e) - new Date(s);
+    if (diffMs <= 0) {
+        el.style.cssText = 'background:#fcebeb;color:#a32d2d;border-color:#f7c1c1;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;text-align:center;';
+        el.textContent = '⚠️ End time must be after start time'; return;
+    }
+    el.style.cssText = 'background:#e1f5ee;color:#1d9e75;border-color:#9fe1cb;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;text-align:center;border:1px solid;';
+    const hrs  = Math.floor(diffMs/3600000);
+    const mins = Math.floor((diffMs%3600000)/60000);
+    el.textContent = hrs > 0
+        ? `⏱ Duration: ${hrs} hour${hrs!==1?'s':''} ${mins>0?mins+' min':''}`
+        : `⏱ Duration: ${mins} minute${mins!==1?'s':''}`;
+}
     </script>
 }

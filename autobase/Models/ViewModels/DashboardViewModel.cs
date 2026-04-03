@@ -10,6 +10,7 @@ namespace autobase.Models.ViewModels
         public string Role { get; set; } = string.Empty;
         public List<Vehicle> AvailableVehicles { get; set; } = new();
         public List<VehicleRequest> MyRequests { get; set; } = new();
+        public List<InUseVehicleInfo> InUseVehicles { get; set; } = new();
     }
 
     public class VehicleRequestViewModel
@@ -18,5 +19,17 @@ namespace autobase.Models.ViewModels
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Purpose { get; set; } = string.Empty;
+    }
+
+    public class InUseVehicleInfo
+    {
+        public int VehicleId { get; set; }
+
+        public string VehicleName { get; set; } = "";
+        public string RegistrationNumber { get; set; } = "";
+        public string VehicleType { get; set; } = "";
+        public string UserName { get; set; } = "";
+        public string EmployeeNumber { get; set; } = "";
+        public DateTime EndTime { get; set; }
     }
 }
