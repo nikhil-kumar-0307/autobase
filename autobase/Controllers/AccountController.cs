@@ -77,7 +77,7 @@ namespace autobase.Controllers
                 return View(model);
             }
 
-            // ✅ Store user details in Session
+            // Store user details in Session
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("UserName", user.Name);
             HttpContext.Session.SetString("UserEmployeeNumber", user.EmployeeNumber);

@@ -853,6 +853,49 @@
     .confirm-reject {
         background: var(--red);
     }
+    /* Overdue tag */
+    .overdue-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: #fff1f1;
+        color: #b83535;
+        border: 1px solid #f5bfbf;
+        border-radius: 20px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Overdue row highlight */
+    .row-overdue {
+        background: #fffbf0 !important;
+    }
+
+        .row-overdue:hover {
+            background: #fff6e0 !important;
+        }
+
+        /* Overdue row left border accent */
+        .row-overdue td:first-child {
+            border-left: 3px solid #c47d10;
+        }
+
+    /* Combined in-use + overdue tag */
+    .inuse-overdue-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: #fff1f1;
+        color: #b83535;
+        border: 1px solid #f5bfbf;
+        border-radius: 20px;
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }   
 </style>
 
 <div class="ab-shell">
@@ -954,12 +997,23 @@
                                 }
                                 @foreach (var r in Model.AllRequests)
                                 {
+                                    // A vehicle is "actively in use" if another approved request's window covers now
                                     bool vehicleCurrentlyInUse = Model.AllRequests.Any(other =>
                                     other.VehicleId == r.VehicleId &&
                                     other.Id != r.Id &&
                                     other.Status == "Approved" &&
                                     other.StartTime <= DateTime.Now &&
                                     other.EndTime >= DateTime.Now);
+
+                                    // A vehicle is "overdue" if THIS row is approved and past its EndTime (not yet completed)
+                                    bool thisRowIsOverdue = r.Status == "Approved" && r.EndTime < DateTime.Now;
+
+                                    // Another approved request for same vehicle is overdue (blocking this vehicle)
+                                    bool vehicleIsOverdue = Model.AllRequests.Any(other =>
+                                    other.VehicleId == r.VehicleId &&
+                                    other.Id != r.Id &&
+                                    other.Status == "Approved" &&
+                                    other.EndTime < DateTime.Now);
 
                                     double hrs = (r.EndTime - r.StartTime).TotalHours;
                                     string dur = hrs >= 24
@@ -985,9 +1039,9 @@
                                     string jsUser = r.UserName.Replace("'", "\\'");
                                     string jsEmp = r.EmployeeNumber.Replace("'", "\\'");
 
-                                    <tr class="req-row"
+                                    <tr class="req-row @(thisRowIsOverdue ? "row-overdue" : "")"
                                         data-status="@r.Status.ToLower()"
-                                        data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower() @(vehicleCurrentlyInUse ? "in use" : "")">
+                                        data-search="@r.UserName.ToLower() @r.EmployeeNumber.ToLower() @r.VehicleName.ToLower() @r.RegistrationNumber.ToLower() @(vehicleCurrentlyInUse || vehicleIsOverdue ? "in use" : "") @(thisRowIsOverdue || vehicleIsOverdue ? "overdue" : "")">
 
                                         <!-- # -->
                                         <td class="td-num">@i</td>
@@ -1007,7 +1061,15 @@
                                         <td>
                                             <div class="veh-name">
                                                 @r.VehicleName
-                                                @if (vehicleCurrentlyInUse && r.Status == "Pending")
+                                                @if (thisRowIsOverdue)
+                                                {
+                                                    <span class="overdue-tag">⏰ Overdue</span>
+                                                }
+                                                else if (vehicleIsOverdue && r.Status == "Pending")
+                                                {
+                                                    <span class="inuse-overdue-tag">⚠️ In Use · Overdue</span>
+                                                }
+                                                else if (vehicleCurrentlyInUse && r.Status == "Pending")
                                                 {
                                                     <span class="inuse-tag">🔑 In Use</span>
                                                 }
