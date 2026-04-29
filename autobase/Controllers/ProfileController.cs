@@ -42,6 +42,8 @@ namespace autobase.Controllers
                 Name = user.Name,
                 EmployeeNumber = user.EmployeeNumber,
                 MobileNumber = user.MobileNumber,
+                Designation = user.Designation,    // ← new
+                Department = user.Department,   // ← new
                 Role = user.Role
             };
 

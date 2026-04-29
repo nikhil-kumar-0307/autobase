@@ -7,6 +7,8 @@ namespace autobase.Models.ViewModels
         public string UserName { get; set; } = string.Empty;
         public string EmployeeNumber { get; set; } = string.Empty;
         public string Mobile { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;   // ← new
+        public string Department { get; set; } = string.Empty;    // ← new
         public string Role { get; set; } = string.Empty;
         public List<Vehicle> AvailableVehicles { get; set; } = new();
         public List<VehicleRequest> MyRequests { get; set; } = new();

@@ -47,6 +47,8 @@ namespace autobase.Controllers
                 Name = model.Name,
                 EmployeeNumber = model.EmployeeNumber,
                 MobileNumber = model.MobileNumber,
+                Designation = model.Designation,   // ← new
+                Department = model.Department,    // ← new
                 Password = HashPassword(model.Password),
                 Role = model.Role
             };

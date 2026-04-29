@@ -996,6 +996,8 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Employee</th>
+                                    <!--<th>Designation</th>    ← new -->
+                                    <!--<th>Department</th>  ← new -->
                                     <th>Vehicle</th>
                                     <th>Reg No</th>
                                     <th>Start</th>
@@ -1062,6 +1064,8 @@
                                     string jsStart    = r.StartTime.ToString("dd MMM yyyy hh:mm tt");
                                     string jsEnd      = r.EndTime.ToString("dd MMM yyyy hh:mm tt");
                                     string jsReqOn    = r.CreatedAt.ToString("dd MMM yyyy hh:mm tt");
+                                    string jsDesig = r.Designation.Replace("'", "\\'");    // ← new
+                                    string jsDept = r.Department.Replace("'", "\\'");     // ← new
 
                                     <tr class="req-row @(thisRowIsOverdue ? "row-overdue" : "")"
                                         data-status="@r.Status.ToLower()"
@@ -1077,10 +1081,32 @@
                                                 <div>
                                                     <div class="emp-name">@r.UserName</div>
                                                     <div class="emp-sub">@r.EmployeeNumber · @r.UserMobile</div>
+                                                    @if (!string.IsNullOrEmpty(r.Designation))
+                                                    {
+                                                        <div style="font-size:11px;color:var(--text-2);margin-top:2px;font-family:var(--font);">
+                                                            @r.Designation
+                                                            @if (!string.IsNullOrEmpty(r.Department))
+                                                            {
+                                                                <span style="color:var(--text-3);">· @r.Department</span>
+                                                            }
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </td>
+                                        <!-- Designation -->   <!-- ← new 
+                                        <td>
+                                            <div style="font-size:13px;font-weight:600;color:var(--text);">
+                                                @(string.IsNullOrEmpty(r.Designation) ? "—" : r.Designation)
+                                            </div>
+                                        </td>-->
 
+                                        <!-- Department -->    <!-- ← new 
+                                        <td>
+                                            <div style="font-size:13px;font-weight:600;color:var(--text);">
+                                                @(string.IsNullOrEmpty(r.Department) ? "—" : r.Department)
+                                            </div>
+                                        </td>-->
                                         <!-- Vehicle -->
                                         <td>
                                             <div class="veh-name">
@@ -1177,11 +1203,12 @@
                                                     </form>
                                                     <button type="button" class="act-btn btn-print"
                                                             onclick="triggerRequestPDF(this,
-                                                                '@jsUser','@jsEmp','@jsMobile',
-                                                                '@jsName','@jsReg',
-                                                                '@jsStart','@jsEnd',
-                                                                '@dur','@jsPurpose',
-                                                                '@jsNotes','@jsReqOn','Approved')">
+                                                        '@jsUser','@jsEmp','@jsMobile',
+                                                        '@jsDesig','@jsDept',
+                                                        '@jsName','@jsReg',
+                                                        '@jsStart','@jsEnd',
+                                                        '@dur','@jsPurpose',
+                                                        '@jsNotes','@jsReqOn','Approved')">
                                                         🖨 Print
                                                     </button>
                                                 }
@@ -1332,9 +1359,11 @@
         });
 
         /* ── Print PDF wrapper ── */
-        function triggerRequestPDF(btn, userName, empNo, mobile, vehicleName, regNo,
-        startStr, endStr, dur, purpose, adminNotes, requestedOn, status) {
-        // Guard: make sure the library loaded
+        function triggerRequestPDF(btn, userName, empNo, mobile,
+        designation, department,
+        vehicleName, regNo,
+        startStr, endStr, dur, purpose,
+        adminNotes, requestedOn, status) {
         if (typeof html2pdf === 'undefined') {
         alert('PDF library is not loaded yet. Please wait a moment and try again.');
         return;
@@ -1345,8 +1374,11 @@
 
         setTimeout(() => {
         try {
-        downloadRequestPDF(userName, empNo, mobile, vehicleName, regNo,
-        startStr, endStr, dur, purpose, adminNotes, requestedOn, status);
+        downloadRequestPDF(userName, empNo, mobile,
+        designation, department,
+        vehicleName, regNo,
+        startStr, endStr, dur, purpose,
+        adminNotes, requestedOn, status);
         } catch (err) {
         console.error('PDF generation error:', err);
         alert('Could not generate PDF. Please try again.');

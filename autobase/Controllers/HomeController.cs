@@ -25,12 +25,20 @@ namespace autobase.Controllers
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
                 return RedirectToAction("Login", "Account");
 
+            // ── Fetch user from DB to get Designation & Department ──  // ← new
+            var userId = HttpContext.Session.GetString("UserId");        // ← new
+            var user = _db.Users.Find(int.Parse(userId!));            // ← new
+
+
             var model = new UserDashboardViewModel
             {
                 UserName = HttpContext.Session.GetString("UserName") ?? "",
                 EmployeeNumber = HttpContext.Session.GetString("UserEmployeeNumber") ?? "",
                 Mobile = HttpContext.Session.GetString("UserMobile") ?? "",
                 Role = HttpContext.Session.GetString("UserRole") ?? "",
+                Designation = user?.Designation ?? "",               // ← new
+                Department = user?.Department ?? "",               // ← new
+
 
                 AvailableVehicles = _db.Vehicles
                     .Where(v => v.IsActive && v.Status == "Available")
@@ -78,7 +86,6 @@ namespace autobase.Controllers
 
             var vehicle = _db.Vehicles.Find(model.VehicleId);
 
-            // ✅ CHANGED: Allow "In Use" vehicles too (for future bookings)
             if (vehicle == null || !vehicle.IsActive)
             {
                 TempData["Error"] = "This vehicle is no longer available.";
@@ -91,7 +98,6 @@ namespace autobase.Controllers
                 return RedirectToAction("Dashboard");
             }
 
-            // ✅ NEW: Block only if there's an actual time overlap with an approved booking
             bool hasConflict = _db.VehicleRequests.Any(r =>
                 r.VehicleId == model.VehicleId &&
                 r.Status == "Approved" &&
@@ -104,12 +110,18 @@ namespace autobase.Controllers
                 return RedirectToAction("Dashboard");
             }
 
+            // ── Look up the logged-in user to get Designation & Department ──   // ← new
+            var userId = HttpContext.Session.GetString("UserId");                  // ← new
+            var user = _db.Users.Find(int.Parse(userId!));                      // ← new
+
             var request = new VehicleRequest
             {
-                UserId = HttpContext.Session.GetString("UserId") ?? "",
+                UserId = userId ?? "",
                 UserName = HttpContext.Session.GetString("UserName") ?? "",
                 EmployeeNumber = HttpContext.Session.GetString("UserEmployeeNumber") ?? "",
                 UserMobile = HttpContext.Session.GetString("UserMobile") ?? "",
+                Designation = user?.Designation ?? "",                      // ← new
+                Department = user?.Department ?? "",                      // ← new
                 VehicleId = vehicle.Id,
                 VehicleName = vehicle.VehicleName,
                 RegistrationNumber = vehicle.RegistrationNumber,

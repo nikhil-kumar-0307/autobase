@@ -16,6 +16,11 @@ namespace autobase.Models.ViewModels
         [Display(Name = "Mobile Number")]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Enter a valid 10-digit mobile number")]
         public required string MobileNumber { get; set; }
+        [Required(ErrorMessage = "Designation is required")]
+        public string Designation { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Department is required")]
+        public string Department { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]

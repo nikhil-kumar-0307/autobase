@@ -7,6 +7,8 @@
         public string UserName { get; set; } = string.Empty;
         public string EmployeeNumber { get; set; } = string.Empty;
         public string UserMobile { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;   // ← new
+        public string Department { get; set; } = string.Empty;    // ← new
         public int VehicleId { get; set; }
         public string VehicleName { get; set; } = string.Empty;
         public string RegistrationNumber { get; set; } = string.Empty;

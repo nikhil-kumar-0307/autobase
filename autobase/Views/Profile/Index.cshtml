@@ -373,6 +373,14 @@
                                 <span class="profile-info-value">#@Model.EmployeeNumber</span>
                             </div>
                             <div class="profile-info-row">
+                                <span class="profile-info-label">Designation</span>
+                                <span class="profile-info-value">@(string.IsNullOrEmpty(Model.Designation) ? "—" : Model.Designation)</span>
+                            </div>
+                            <div class="profile-info-row">
+                                <span class="profile-info-label">Department</span>
+                                <span class="profile-info-value">@(string.IsNullOrEmpty(Model.Department) ? "—" : Model.Department)</span>
+                            </div>
+                            <div class="profile-info-row">
                                 <span class="profile-info-label">Role</span>
                                 <span class="profile-info-value">@Model.Role</span>
                             </div>
@@ -401,6 +409,20 @@
                             <div class="form-group">
                                 <label class="form-label">Mobile Number</label>
                                 <input type="text" class="form-control" value="@Model.MobileNumber" readonly />
+                            </div>
+                            <div class="form-group">
+                                <!-- ← new -->
+                                <label class="form-label">Designation</label>
+                                <input type="text" class="form-control"
+                                       value="@(string.IsNullOrEmpty(Model.Designation) ? "—" : Model.Designation)"
+                                       readonly />
+                            </div>
+                            <div class="form-group">
+                                <!-- ← new -->
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control"
+                                       value="@(string.IsNullOrEmpty(Model.Department) ? "—" : Model.Department)"
+                                       readonly />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Role</label>

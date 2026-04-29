@@ -63,8 +63,6 @@ function _renderPdf(html, opts) {
 
 /* ── Helper: parse a Date object into date & time strings ── */
 function parseDatetime(dt) {
-    // dt should be a JS Date object.
-    // Returns { date: '25 Apr 2026', time: '10:30 AM' }
     const date = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     const time = dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
     return { date, time };
@@ -73,16 +71,11 @@ function parseDatetime(dt) {
 
 /* ════════════════════════════════════════════════════════════
    downloadRequestPDF – NTPC-style Vehicle Requisition Form
-   Called from the Print button in Vehicle Requests (SeeRequest)
-
-   CHANGE from old version:
-   Pass start/end as JS Date objects (or ISO strings) instead of
-   pre-formatted strings — this avoids fragile string splitting.
 ════════════════════════════════════════════════════════════ */
-function downloadRequestPDF(userName, empNo, mobile, vehicleName, regNo,
-    startRaw, endRaw, dur, purpose, adminNotes, requestedOn, status) {
+function downloadRequestPDF(userName, empNo, mobile, designation, department,   // ← new params
+    vehicleName, regNo, startRaw, endRaw, dur,
+    purpose, adminNotes, requestedOn, status) {
 
-    // Accept Date objects or ISO/string values
     const startDt = new Date(startRaw);
     const endDt = new Date(endRaw);
     const { date: startDate, time: startTime } = parseDatetime(startDt);
@@ -138,11 +131,17 @@ function downloadRequestPDF(userName, empNo, mobile, vehicleName, regNo,
         <tr>
           <td style="border:1px solid #000; padding:6px 8px; font-weight:700; vertical-align:top;">3</td>
           <td style="border:1px solid #000; padding:6px 8px; vertical-align:top;">
-            Designation: <span style="border-bottom:1px dotted #000; display:inline-block; min-width:160px;">&nbsp;</span>
+            Designation:
+            <span style="border-bottom:1px dotted #000; display:inline-block; min-width:160px;">
+              &nbsp;<strong>${designation || '—'}</strong>&nbsp;
+            </span>
           </td>
           <td style="border:1px solid #000; padding:6px 8px; font-weight:700; vertical-align:top;">4</td>
           <td style="border:1px solid #000; padding:6px 8px; vertical-align:top;">
-            Department: <span style="border-bottom:1px dotted #000; display:inline-block; min-width:160px;">&nbsp;</span>
+            Department:
+            <span style="border-bottom:1px dotted #000; display:inline-block; min-width:160px;">
+              &nbsp;<strong>${department || '—'}</strong>&nbsp;
+            </span>
           </td>
         </tr>
 
@@ -276,14 +275,6 @@ function downloadRequestPDF(userName, empNo, mobile, vehicleName, regNo,
       <div style="text-align:right; margin-top:30px; font-size:12px; font-weight:700;">
         Signature of In-Charge
       </div>
-
-      <!-- Footer 
-      <div style="margin-top:16px; border-top:1px solid #ccc; padding-top:6px;
-                  display:flex; justify-content:space-between;
-                  font-size:9px; color:#888;">
-        <span>Generated on ${nowStr()}</span>
-        <span>Autobase Fleet Management — ${regNo}</span>
-      </div>-->
 
     </div>`;
 

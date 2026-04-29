@@ -304,6 +304,8 @@
                                 <th>Name</th>
                                 <th>Employee No.</th>
                                 <th>Mobile</th>
+                                <th>Designation</th>
+                                <th>Department</th>
                                 <th>Role</th>
                                 <th>Action</th>
                             </tr>
@@ -321,6 +323,8 @@
                                     </td>
                                     <td style="font-family:monospace;font-size:13px;">#@u.EmployeeNumber</td>
                                     <td style="font-family:monospace;font-size:13px;">@u.MobileNumber</td>
+                                    <td style="font-size:13px;">@u.Designation</td>
+                                    <td style="font-size:13px;">@u.Department</td>
                                     <td>
                                         @{
                                             var rc = u.Role switch

@@ -78,6 +78,8 @@ namespace autobase.Controllers
                 Name = model.Name,
                 EmployeeNumber = model.EmployeeNumber,
                 MobileNumber = model.MobileNumber,
+                Designation = model.Designation,   // ← new
+                Department = model.Department,    // ← new
                 Password = HashPassword(model.Password),
                 Role = model.Role
             };
@@ -145,6 +147,8 @@ namespace autobase.Controllers
                 Name = user.Name,
                 EmployeeNumber = user.EmployeeNumber,
                 MobileNumber = user.MobileNumber,
+                Designation = user.Designation,    // ← new
+                Department = user.Department, // ← new
                 Role = user.Role
             };
 
@@ -200,6 +204,8 @@ namespace autobase.Controllers
             user.Name = model.Name;
             user.EmployeeNumber = model.EmployeeNumber;
             user.MobileNumber = model.MobileNumber;
+            user.Designation = model.Designation;   // ← new
+            user.Department = model.Department;    // ← new
             user.Role = model.Role;
 
             // Only update password if a new one was entered

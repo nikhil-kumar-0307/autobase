@@ -8,5 +8,7 @@
         public required string MobileNumber { get; set; }
         public required string Password { get; set; }  
         public required string Role { get; set; }
+        public required string Designation { get; set; }
+        public required string Department { get; set; }
     }
 }
