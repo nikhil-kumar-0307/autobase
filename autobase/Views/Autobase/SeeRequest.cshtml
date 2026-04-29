@@ -622,6 +622,23 @@
             background: #dbeafe;
         }
 
+    /* ── Print / PDF button ── */
+    .btn-print {
+        background: #f5f0ff;
+        color: #6d28d9;
+        border-color: #c4b5fd;
+    }
+
+        .btn-print:hover {
+            background: #ede9fe;
+        }
+
+        .btn-print.btn-loading {
+            opacity: .6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
     .act-none {
         font-size: 12px;
         color: var(--border-dark);
@@ -1035,9 +1052,16 @@
                                     .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                     .Take(2).Select(w => w[0])).ToUpper();
 
-                                    string jsName = r.VehicleName.Replace("'", "\\'");
-                                    string jsUser = r.UserName.Replace("'", "\\'");
-                                    string jsEmp = r.EmployeeNumber.Replace("'", "\\'");
+                                    string jsName     = r.VehicleName.Replace("'", "\\'");
+                                    string jsUser     = r.UserName.Replace("'", "\\'");
+                                    string jsEmp      = r.EmployeeNumber.Replace("'", "\\'");
+                                    string jsMobile   = r.UserMobile.Replace("'", "\\'");
+                                    string jsReg      = r.RegistrationNumber.Replace("'", "\\'");
+                                    string jsPurpose  = (r.Purpose ?? "").Replace("'", "\\'");
+                                    string jsNotes    = (r.AdminNotes ?? "").Replace("'", "\\'");
+                                    string jsStart    = r.StartTime.ToString("dd MMM yyyy hh:mm tt");
+                                    string jsEnd      = r.EndTime.ToString("dd MMM yyyy hh:mm tt");
+                                    string jsReqOn    = r.CreatedAt.ToString("dd MMM yyyy hh:mm tt");
 
                                     <tr class="req-row @(thisRowIsOverdue ? "row-overdue" : "")"
                                         data-status="@r.Status.ToLower()"
@@ -1151,6 +1175,15 @@
                                                             ✔ Mark Returned
                                                         </button>
                                                     </form>
+                                                    <button type="button" class="act-btn btn-print"
+                                                            onclick="triggerRequestPDF(this,
+                                                                '@jsUser','@jsEmp','@jsMobile',
+                                                                '@jsName','@jsReg',
+                                                                '@jsStart','@jsEnd',
+                                                                '@dur','@jsPurpose',
+                                                                '@jsNotes','@jsReqOn','Approved')">
+                                                        🖨 Print
+                                                    </button>
                                                 }
                                                 else
                                                 {
@@ -1226,76 +1259,105 @@
 </div>
 
 @section Scripts {
+    <!-- html2pdf library (required for PDF generation) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Shared PDF helpers (downloadRequestPDF lives here) -->
+    <script src="~/js/allocatedVehiclesPdf.js" asp-append-version="true"></script>
+
     <script>
         /* ── Filter / Search ── */
         let activeFilter = 'all';
 
         function setFilter(status, btn) {
-            activeFilter = status;
-            // Reset all pills
-            document.querySelectorAll('.fp').forEach(b => {
-                b.className = 'fp';
-            });
-            // Activate clicked
-            if (btn) btn.classList.add('active-' + status);
-            applyFilters();
+        activeFilter = status;
+        document.querySelectorAll('.fp').forEach(b => { b.className = 'fp'; });
+        if (btn) btn.classList.add('active-' + status);
+        applyFilters();
         }
 
         document.getElementById('reqSearch').addEventListener('input', applyFilters);
 
         function applyFilters() {
-            const q = document.getElementById('reqSearch').value.toLowerCase().trim();
-            document.querySelectorAll('.req-row').forEach(row => {
-                const statusOk = activeFilter === 'all' || row.dataset.status === activeFilter;
-                const searchOk = !q || row.dataset.search.includes(q);
-                row.style.display = statusOk && searchOk ? '' : 'none';
-            });
+        const q = document.getElementById('reqSearch').value.toLowerCase().trim();
+        document.querySelectorAll('.req-row').forEach(row => {
+        const statusOk = activeFilter === 'all' || row.dataset.status === activeFilter;
+        const searchOk = !q || row.dataset.search.includes(q);
+        row.style.display = statusOk && searchOk ? '' : 'none';
+        });
         }
 
-        // Stat card click — sync pill active state
         document.querySelectorAll('.stat-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const map = {
-                    'stat-total': 'all', 'stat-pending': 'pending',
-                    'stat-approved': 'approved', 'stat-rejected': 'rejected',
-                    'stat-completed': 'completed'
-                };
-                for (const [cls, status] of Object.entries(map)) {
-                    if (this.classList.contains(cls)) {
-                        const pill = document.querySelector(`.fp[data-f="${status}"]`);
-                        setFilter(status, pill);
-                        break;
-                    }
-                }
-            });
+        card.addEventListener('click', function () {
+        const map = {
+        'stat-total': 'all', 'stat-pending': 'pending',
+        'stat-approved': 'approved', 'stat-rejected': 'rejected',
+        'stat-completed': 'completed'
+        };
+        for (const [cls, status] of Object.entries(map)) {
+        if (this.classList.contains(cls)) {
+        const pill = document.querySelector(`.fp[data-f="${status}"]`);
+        setFilter(status, pill);
+        break;
+        }
+        }
+        });
         });
 
         /* ── Modals ── */
         function openApprove(id, userName, empNo, vehicleName) {
-            document.getElementById('ap-id').value              = id;
-            document.getElementById('ap-vehicle').textContent   = vehicleName;
-            document.getElementById('ap-user').textContent      = userName + '  ·  ' + empNo;
-            document.getElementById('ap-notes').value           = '';
-            document.getElementById('approveModal').classList.add('open');
+        document.getElementById('ap-id').value            = id;
+        document.getElementById('ap-vehicle').textContent = vehicleName;
+        document.getElementById('ap-user').textContent    = userName + '  ·  ' + empNo;
+        document.getElementById('ap-notes').value         = '';
+        document.getElementById('approveModal').classList.add('open');
         }
 
         function openReject(id, userName, empNo, vehicleName) {
-            document.getElementById('rj-id').value              = id;
-            document.getElementById('rj-vehicle').textContent   = vehicleName;
-            document.getElementById('rj-user').textContent      = userName + '  ·  ' + empNo;
-            document.getElementById('rj-notes').value           = '';
-            document.getElementById('rejectModal').classList.add('open');
+        document.getElementById('rj-id').value            = id;
+        document.getElementById('rj-vehicle').textContent = vehicleName;
+        document.getElementById('rj-user').textContent    = userName + '  ·  ' + empNo;
+        document.getElementById('rj-notes').value         = '';
+        document.getElementById('rejectModal').classList.add('open');
         }
 
         function closeModals() {
-            document.getElementById('approveModal').classList.remove('open');
-            document.getElementById('rejectModal').classList.remove('open');
+        document.getElementById('approveModal').classList.remove('open');
+        document.getElementById('rejectModal').classList.remove('open');
         }
 
         ['approveModal', 'rejectModal'].forEach(id => {
-            document.getElementById(id).addEventListener('click', function(e) {
-                if (e.target === this) closeModals();
-            });
+        document.getElementById(id).addEventListener('click', function (e) {
+        if (e.target === this) closeModals();
         });
+        });
+
+        /* ── Print PDF wrapper ── */
+        function triggerRequestPDF(btn, userName, empNo, mobile, vehicleName, regNo,
+        startStr, endStr, dur, purpose, adminNotes, requestedOn, status) {
+        // Guard: make sure the library loaded
+        if (typeof html2pdf === 'undefined') {
+        alert('PDF library is not loaded yet. Please wait a moment and try again.');
+        return;
+        }
+
+        btn.classList.add('btn-loading');
+        btn.textContent = '⏳ Generating…';
+
+        setTimeout(() => {
+        try {
+        downloadRequestPDF(userName, empNo, mobile, vehicleName, regNo,
+        startStr, endStr, dur, purpose, adminNotes, requestedOn, status);
+        } catch (err) {
+        console.error('PDF generation error:', err);
+        alert('Could not generate PDF. Please try again.');
+        } finally {
+        setTimeout(() => {
+        btn.classList.remove('btn-loading');
+        btn.innerHTML = '🖨 Print';
+        }, 2500);
+        }
+        }, 60);
+        }
     </script>
 }
+
